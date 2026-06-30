@@ -1350,7 +1350,10 @@
 
     function applyTextDefaults() {
       Object.entries(textDefaults).forEach(([id, text]) => {
-        if (el(id) && !val(id)) el(id).value = text;
+        if (!el(id)) return;
+        if (!val(id) || (id === "outageHouseholds" && val(id) === "0")) {
+          el(id).value = text;
+        }
       });
     }
 
