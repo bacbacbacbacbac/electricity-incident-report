@@ -619,7 +619,7 @@
     @media print {
       @page {
         size: A4;
-        margin: 8mm;
+        margin: 0;
       }
 
       html,
@@ -655,14 +655,17 @@
 
       #paper.paper {
         display: block !important;
-        width: 100% !important;
+        width: 210mm !important;
         max-width: none !important;
         height: auto !important;
         min-height: 0 !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 6mm 8mm 5mm !important;
         box-shadow: none !important;
         transform: none !important;
+        font-family: "DFKai-SB", "BiauKai", "標楷體", "PMingLiU", "Kaiti TC", "Songti TC", serif !important;
+        font-size: 12.2px !important;
+        line-height: 1.24 !important;
         break-after: avoid-page !important;
         page-break-after: avoid !important;
         break-inside: auto;
@@ -677,7 +680,38 @@
       }
 
       .casualty-row {
-        font-size: 10px;
+        font-size: 9.5px;
+      }
+
+      #paper .official-title {
+        margin-bottom: 8px !important;
+        font-size: 17px !important;
+      }
+
+      #paper .official-meta {
+        margin-bottom: 5px !important;
+      }
+
+      #paper .official-footer {
+        margin-top: 4px !important;
+        row-gap: 4px !important;
+        font-size: 11px !important;
+      }
+
+      #paper .official th,
+      #paper .official td {
+        padding: 2.5px 4px !important;
+        min-height: 18px !important;
+      }
+
+      #paper .official .multiline,
+      #paper .official .multiline > span {
+        min-height: 30px !important;
+      }
+
+      #paper .official .large-text,
+      #paper .official .large-text > span {
+        min-height: 52px !important;
       }
 
       .print-only {
