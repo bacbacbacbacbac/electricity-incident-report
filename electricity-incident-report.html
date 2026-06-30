@@ -1,0 +1,1563 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b6f6a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="電業速報表">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <title>電業事故速報表</title>
+  <style>
+    :root {
+      --ink: #202124;
+      --muted: #5f6368;
+      --line: #303134;
+      --soft-line: #dadce0;
+      --paper: #ffffff;
+      --bg: #f6f7f9;
+      --accent: #0b6f6a;
+      --accent-2: #9b5a00;
+      --danger: #b3261e;
+      --ok: #137333;
+      --focus: #1a73e8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 1px solid var(--soft-line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px;
+      padding: 9px 12px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    button.warn {
+      border-color: #e8c99a;
+      background: #fff8eb;
+      color: #7a4700;
+    }
+
+    button:focus,
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: 2px solid var(--focus);
+      outline-offset: 1px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(340px, 480px) minmax(720px, 1fr);
+      min-height: 100vh;
+    }
+
+    .editor {
+      height: 100vh;
+      overflow: auto;
+      padding: 18px;
+      border-right: 1px solid var(--soft-line);
+      background: #fff;
+    }
+
+    .preview-shell {
+      height: 100vh;
+      overflow: auto;
+      padding: 22px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .subtle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      margin: 10px 0 14px;
+      padding: 10px 12px;
+      border: 1px solid #c7ddd9;
+      border-left: 4px solid var(--accent);
+      background: #eef8f6;
+      border-radius: 6px;
+      color: #0b514d;
+    }
+
+    .status.overdue {
+      border-color: #f3c0bd;
+      border-left-color: var(--danger);
+      background: #fff1f0;
+      color: var(--danger);
+    }
+
+    .status.fast {
+      border-color: #ecd09c;
+      border-left-color: var(--accent-2);
+      background: #fff8eb;
+      color: #6d4400;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 18px;
+    }
+
+    fieldset {
+      margin: 0 0 16px;
+      padding: 14px;
+      border: 1px solid var(--soft-line);
+      border-radius: 8px;
+    }
+
+    legend {
+      padding: 0 6px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid.impact-grid {
+      grid-template-columns: repeat(3, 124px);
+      align-items: start;
+      justify-content: start;
+      gap: 8px 14px;
+      max-width: 410px;
+    }
+
+    .grid.impact-grid input[inputmode="numeric"] {
+      width: 64px;
+      max-width: 64px;
+      padding: 6px 7px;
+      text-align: center;
+    }
+
+    .grid.impact-grid .field:not(.full) {
+      width: 124px;
+    }
+
+    .grid.impact-grid .field:not(.full) .label,
+    .grid.impact-grid .field:not(.full) {
+      white-space: nowrap;
+    }
+
+    .grid.impact-grid #outageHouseholds {
+      width: 96px;
+      max-width: 96px;
+    }
+
+    .grid.impact-grid textarea,
+    .grid.impact-grid #otherPollutionText {
+      max-width: 400px;
+    }
+
+    .grid.impact-grid .impact-wide {
+      grid-column: 1 / -1;
+      max-width: 400px;
+    }
+
+    .grid.impact-grid .impact-environment {
+      grid-row: auto;
+    }
+
+    .grid.impact-grid .impact-environment .checks.compact {
+      grid-template-columns: repeat(3, 90px);
+      max-width: 360px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label,
+    .label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #303134;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #c7c9cc;
+      border-radius: 5px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .fixed-display {
+      border-color: transparent;
+      background: #f8f9fa;
+      color: #202124;
+      box-shadow: inset 0 -1px 0 #c7c9cc;
+      cursor: default;
+    }
+
+    textarea.fixed-display {
+      resize: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .checks {
+      display: grid;
+      gap: 8px;
+    }
+
+    .checks.compact {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      font-size: 14px;
+    }
+
+    .check input {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+
+    .errors {
+      display: none;
+      margin: 0 0 14px;
+      padding: 10px 12px;
+      border: 1px solid #f3c0bd;
+      border-left: 4px solid var(--danger);
+      background: #fff1f0;
+      color: var(--danger);
+      border-radius: 6px;
+    }
+
+    .errors.show {
+      display: block;
+    }
+
+    .errors ul {
+      margin: 6px 0 0 18px;
+      padding: 0;
+    }
+
+    .errors.info {
+      border-color: #c7ddd9;
+      border-left-color: var(--accent);
+      background: #eef8f6;
+      color: #0b514d;
+    }
+
+    .paper {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto 20px;
+      padding: 6mm 18mm 8mm 12mm;
+      background: var(--paper);
+      box-shadow: 0 6px 28px rgba(60, 64, 67, .16);
+      color: #000;
+      font-family: "Times New Roman", "DFKai-SB", "BiauKai", "標楷體", "PMingLiU", serif;
+      font-size: 13px;
+      line-height: 1.38;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      transform-origin: top left;
+    }
+
+    .official-title {
+      margin: 0 0 18px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .official-meta,
+    .official-footer {
+      display: grid;
+      grid-template-columns: 1.15fr 1.15fr .65fr 1.15fr;
+      gap: 18px;
+      margin: 0 3px 10px;
+      font-weight: 700;
+    }
+
+    .official-footer {
+      margin-top: 6px;
+      font-weight: 400;
+      row-gap: 8px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .official-meta {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .official-footer .supervisor-line {
+      grid-column: 1 / -1;
+    }
+
+    .page-number {
+      margin-top: 26px;
+      text-align: center;
+      color: #6b6f72;
+      font-size: 12px;
+    }
+
+    .second-page {
+      padding-top: 20mm;
+    }
+
+    table.official {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      border: 1px solid #000;
+    }
+
+    .official th,
+    .official td {
+      border: 1px solid #000;
+      padding: 4px 5px;
+      vertical-align: middle;
+      word-break: break-word;
+      overflow-wrap: anywhere;
+      min-height: 24px;
+    }
+
+    .official .nowrap {
+      white-space: nowrap;
+    }
+
+    .official th {
+      text-align: center;
+      font-weight: 700;
+      background: #fff;
+    }
+
+    .narrow {
+      width: 40px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .label-col {
+      width: 42px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .small-label {
+      width: 42px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .line-value {
+      display: inline-block;
+      min-width: 80px;
+      border-bottom: 1px solid transparent;
+    }
+
+    .boxline {
+      display: inline-block;
+      min-width: 84px;
+      margin: 0 2px;
+      border-bottom: 1px solid #000;
+      text-align: center;
+    }
+
+    .count-line {
+      min-width: 18px;
+      width: 18px;
+      margin: 0 1px;
+    }
+
+    .casualty-row {
+      white-space: nowrap;
+      letter-spacing: 0;
+      font-size: 10.4px;
+    }
+
+    .official .casualty-row .boxline {
+      min-width: 14px;
+      width: 14px;
+      margin: 0;
+    }
+
+    .checkmark {
+      display: inline-block;
+      min-width: 1.15em;
+      font-family: "Microsoft JhengHei", Arial, sans-serif;
+      font-weight: 700;
+    }
+
+    .official .multiline {
+      white-space: pre-wrap;
+      min-height: 36px;
+    }
+
+    .official .multiline > span {
+      display: flex;
+      align-items: center;
+      min-height: 36px;
+    }
+
+    .official .large-text {
+      min-height: 68px;
+    }
+
+    .official .large-text > span {
+      min-height: 68px;
+    }
+
+    .notes {
+      display: block;
+      border: 1px solid #000;
+      padding: 6px 8px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .notes p {
+      margin: 3px 0;
+    }
+
+    .notes-title {
+      font-weight: 700;
+    }
+
+    .sample-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .print-only {
+      display: none;
+    }
+
+    .hidden-field {
+      display: none;
+    }
+
+    @media (max-width: 1120px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .editor,
+      .preview-shell {
+        height: auto;
+        overflow: visible;
+      }
+
+      .editor {
+        border-right: 0;
+        border-bottom: 1px solid var(--soft-line);
+      }
+
+      .preview-shell {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        font-size: 14px;
+      }
+
+      .editor {
+        padding: 14px 12px 90px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      fieldset {
+        border-radius: 8px;
+        padding: 12px;
+      }
+
+      .grid,
+      .checks.compact {
+        grid-template-columns: 1fr;
+      }
+
+      .grid.impact-grid {
+        grid-template-columns: repeat(3, minmax(86px, 1fr));
+        max-width: none;
+        gap: 8px;
+      }
+
+      .grid.impact-grid .field:not(.full) {
+        width: auto;
+      }
+
+      .grid.impact-grid .field:not(.full) {
+        white-space: normal;
+      }
+
+      .grid.impact-grid input[inputmode="numeric"] {
+        width: 68px;
+        max-width: 100%;
+      }
+
+      .grid.impact-grid .impact-wide,
+      .grid.impact-grid textarea,
+      .grid.impact-grid #otherPollutionText {
+        max-width: none;
+      }
+
+      .grid.impact-grid .impact-environment .checks.compact {
+        grid-template-columns: repeat(3, minmax(82px, 1fr));
+        max-width: none;
+      }
+
+      .topbar {
+        display: block;
+      }
+
+      .actions {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        margin: 12px -12px 16px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.96);
+        border-top: 1px solid var(--soft-line);
+        box-shadow: 0 -6px 18px rgba(60, 64, 67, 0.12);
+      }
+
+      .actions button {
+        flex: 1 1 auto;
+        min-height: 44px;
+      }
+
+      .preview-shell {
+        padding: 10px;
+        overflow-x: hidden;
+      }
+
+      .paper {
+        width: 210mm;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 6mm 18mm 8mm 12mm;
+        font-size: 13px;
+        transform-origin: top left;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 8mm;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .editor,
+      .preview-shell > .actions,
+      .screen-only {
+        display: none !important;
+      }
+
+      .app,
+      .preview-shell {
+        display: block;
+        height: auto;
+        overflow: visible;
+        padding: 0;
+      }
+
+      .paper {
+        width: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        break-after: auto;
+        page-break-after: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .casualty-row {
+        font-size: 10px;
+      }
+
+      .paper + .paper {
+        break-before: page;
+        page-break-before: always;
+      }
+
+      .print-only {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="editor">
+      <div class="topbar">
+        <div>
+          <h1>電業事故速報表</h1>
+          <p class="subtle">測試收件：manda.liu@imperialenergy.com.tw</p>
+        </div>
+      </div>
+
+      <div id="deadlineStatus" class="status"></div>
+      <div id="errors" class="errors"></div>
+
+      <div class="actions">
+        <button type="button" id="printBtn">產出 PDF</button>
+        <button class="primary" type="button" id="completeBtn">開啟郵件草稿</button>
+        <button class="warn" type="button" id="noUpdateFollowBtn">無更新續報 +1</button>
+        <button type="button" id="clearBtn">清空</button>
+      </div>
+
+      <fieldset>
+        <legend>基本資料</legend>
+        <div class="grid">
+          <label class="field full">電業名稱
+            <select id="utilityName" data-required="電業名稱" autocomplete="organization">
+              <option value="節能屋能源科技股份有限公司">節能屋能源科技股份有限公司</option>
+              <option value="華國能源股份有限公司">華國能源股份有限公司</option>
+            </select>
+          </label>
+          <input id="awareTime" data-required="電業知悉時間" type="hidden">
+          <input id="occurredTime" data-required="發生時間" type="hidden">
+          <input id="incidentName" data-required="事故名稱" type="hidden">
+          <textarea id="siteName" data-required="發生地點及案場名稱" class="hidden-field"></textarea>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>事故類別、規模、通報別</legend>
+        <div class="grid">
+          <div class="field full">
+            <div class="label">類別</div>
+            <div class="checks compact" id="categoryGroup">
+              <label class="check"><input type="radio" name="category" value="設備運轉事故" checked>設備運轉事故</label>
+              <label class="check"><input type="radio" name="category" value="工安衛生事故">工安衛生事故</label>
+              <label class="check"><input type="radio" name="category" value="環境影響事故">環境影響事故</label>
+              <label class="check"><input type="radio" name="category" value="勞資爭議事故">勞資爭議事故</label>
+              <label class="check"><input type="radio" name="category" value="其他重大事故">其他重大事故</label>
+            </div>
+            <input id="otherCategory" placeholder="其他重大事故說明">
+          </div>
+          <div class="field">
+            <div class="label">規模</div>
+            <div class="checks" id="scaleGroup">
+              <label class="check"><input type="radio" name="scale" value="特級規模">特級規模</label>
+              <label class="check"><input type="radio" name="scale" value="甲級規模">甲級規模</label>
+              <label class="check"><input type="radio" name="scale" value="乙級規模">乙級規模</label>
+              <label class="check"><input type="radio" name="scale" value="丙級規模" checked>丙級規模</label>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">通報別</div>
+            <div class="checks" id="reportTypeGroup">
+              <label class="check"><input type="radio" name="reportType" id="initialReport" value="initial" checked>初報</label>
+              <label class="check"><input type="radio" name="reportType" id="followReport" value="follow">續報 <input id="followCount" type="number" min="1" inputmode="numeric" style="width:80px" aria-label="續報次數"> 次</label>
+              <label class="check"><input type="radio" name="reportType" id="finalReport" value="final">結報</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>事故內容</legend>
+        <div class="grid">
+          <label class="field full">發生原因
+            <textarea id="cause" data-required="發生原因"></textarea>
+          </label>
+          <div class="field full">
+            <div class="label">特殊設備運轉情形</div>
+            <div class="checks compact">
+              <label class="check"><input type="checkbox" id="hasExplosion">爆炸</label>
+              <label class="check"><input type="checkbox" id="hasFire">火災</label>
+              <label class="check"><input type="checkbox" id="hasHighPressureLeak">高壓氣體洩漏</label>
+              <label class="check"><input type="checkbox" id="hasFlammableLeak">可燃氣體洩漏</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>停止運轉</legend>
+        <div class="grid">
+          <label class="field">無法發電之裝置容量
+            <input id="generationCapacity" placeholder="例：4.9MW">
+          </label>
+          <label class="field">設置儲能設備之特定電力供應業無法供電容量
+            <input id="storageCapacity" placeholder="例：10MW">
+          </label>
+          <label class="field">停止運轉之一次變電所數
+            <input id="substationCount" inputmode="numeric">
+          </label>
+          <label class="field">輸電或單一配電饋線無法供電容量
+            <input id="feederCapacity">
+          </label>
+          <div class="field full">
+            <div class="label">輸配電業中央調度室</div>
+            <div class="checks compact">
+              <label class="check"><input type="checkbox" id="dispatchPartial">部分停止運轉</label>
+              <label class="check"><input type="checkbox" id="dispatchFull">全部停止運轉</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>衝擊影響程度</legend>
+        <div class="grid impact-grid">
+          <label class="field full">停電戶數
+            <input id="outageHouseholds" placeholder="例：無">
+          </label>
+          <label class="field">死亡：員工
+            <input id="deathEmployees" inputmode="numeric">
+          </label>
+          <label class="field">死亡：其他人士
+            <input id="deathOthers" inputmode="numeric">
+          </label>
+          <label class="field">死亡：外籍員工/人士
+            <input id="deathForeign" inputmode="numeric">
+          </label>
+          <label class="field">失蹤：員工
+            <input id="missingEmployees" inputmode="numeric">
+          </label>
+          <label class="field">失蹤：其他人士
+            <input id="missingOthers" inputmode="numeric">
+          </label>
+          <label class="field">失蹤：外籍員工/人士
+            <input id="missingForeign" inputmode="numeric">
+          </label>
+          <label class="field">受傷：員工
+            <input id="injuryEmployees" inputmode="numeric">
+          </label>
+          <label class="field">受傷：其他人士
+            <input id="injuryOthers" inputmode="numeric">
+          </label>
+          <label class="field">受傷：外籍員工/人士
+            <input id="injuryForeign" inputmode="numeric">
+          </label>
+          <div class="field full impact-wide impact-environment">
+            <div class="label">環境影響</div>
+            <div class="checks compact">
+              <label class="check"><input type="checkbox" id="airPollution">空氣污染</label>
+              <label class="check"><input type="checkbox" id="waterPollution">水污染</label>
+              <label class="check"><input type="checkbox" id="otherPollution">其他</label>
+            </div>
+            <input id="otherPollutionText" placeholder="其他環境影響">
+          </div>
+          <label class="field full impact-wide">影響範圍
+            <textarea id="environmentScope"></textarea>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>處理與聯絡</legend>
+        <div class="grid">
+          <label class="field full">處理情形及預計排除或處理完畢時間
+            <textarea id="handling" data-required="處理情形及預計排除或處理完畢時間"></textarea>
+          </label>
+          <label class="field full">備註(如特殊情形或訴求事項)
+            <textarea id="remarks"></textarea>
+          </label>
+          <input id="totalPages" type="hidden">
+          <input id="handler" data-required="承辦人" type="hidden">
+          <input id="phone" data-required="電話" type="hidden">
+          <input id="extension" type="hidden">
+          <input id="mobile" type="hidden">
+          <input id="supervisor" type="hidden">
+          <input id="noUpdateMode" type="hidden" value="0">
+        </div>
+      </fieldset>
+
+    </section>
+
+    <section class="preview-shell">
+      <div class="actions screen-only">
+        <button class="primary" type="button" id="printBtn2">產出 PDF</button>
+        <button type="button" id="completeBtn2">開啟郵件草稿</button>
+      </div>
+      <article class="paper" id="paper">
+        <h2 class="official-title">電業事故速報表</h2>
+        <div class="official-meta">
+          <div>電業名稱：<span id="pUtilityName" class="line-value"></span></div>
+          <div>電業知悉時間：<span id="pAwareTime"></span></div>
+        </div>
+        <table class="official" aria-label="電業事故速報表預覽">
+          <colgroup>
+            <col style="width: 42px">
+            <col style="width: 42px">
+            <col>
+          </colgroup>
+          <tbody>
+            <tr>
+              <td rowspan="3" class="narrow">事故</td>
+              <td class="label-col">名稱</td>
+              <td><span id="pIncidentName"></span></td>
+            </tr>
+            <tr>
+              <td class="label-col">類別</td>
+              <td>
+                <span id="pCatEquipment"></span>設備運轉事故
+                <span id="pCatSafety"></span>工安衛生事故
+                <span id="pCatEnvironment"></span>環境影響事故
+                <span id="pCatLabor"></span>勞資爭議事故
+                <span id="pCatOther"></span>其他重大事故 <span id="pOtherCategory"></span>
+              </td>
+            </tr>
+            <tr>
+              <td class="label-col">規模</td>
+              <td>
+                <span id="pScaleSpecial"></span>特級規模
+                <span id="pScaleA"></span>甲級規模
+                <span id="pScaleB"></span>乙級規模
+                <span id="pScaleC"></span>丙級規模
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">通報別</td>
+              <td>
+                <span id="pInitialReport"></span>初報
+                <span id="pFollowReport"></span>續報(第<span id="pFollowCount">__</span>次)
+                <span id="pFinalReport"></span>結報
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">發生地點及案場名稱</td>
+              <td class="multiline"><span id="pSiteName"></span></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">發生時間</td>
+              <td class="nowrap"><span id="pOccurredTime"></span></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">發生原因</td>
+              <td class="multiline large-text"><span id="pCause"></span></td>
+            </tr>
+            <tr>
+              <td rowspan="5" colspan="2" class="label-col">停止<br>運轉</td>
+              <td><span id="pGenCheck"></span>無法發電之裝置容量 <span id="pGenerationCapacity" class="boxline"></span> MW</td>
+            </tr>
+            <tr>
+              <td><span id="pStorageCheck"></span>設置儲能設備之特定電力供應業無法供電容量 <span id="pStorageCapacity" class="boxline"></span> MW</td>
+            </tr>
+            <tr>
+              <td><span id="pSubstationCheck"></span>停止運轉之一次變電所數 <span id="pSubstationCount" class="boxline"></span></td>
+            </tr>
+            <tr>
+              <td><span id="pDispatchPartial"></span>輸配電業中央調度室部分停止運轉；<span id="pDispatchFull"></span>輸配電業中央調度室全部停止運轉</td>
+            </tr>
+            <tr>
+              <td><span id="pFeederCheck"></span>輸電或單一配電饋線無法供電容量 <span id="pFeederCapacity" class="boxline"></span> MW</td>
+            </tr>
+            <tr>
+              <td rowspan="5" class="narrow">衝擊<br>影響<br>程度</td>
+              <td class="small-label">停電<br>戶數</td>
+              <td><span id="pOutageHouseholds"></span></td>
+            </tr>
+            <tr>
+              <td rowspan="3" class="small-label">人員<br>傷亡</td>
+              <td class="casualty-row">死亡 <span id="pDeathTotal" class="boxline count-line"></span> 人(員工 <span id="pDeathEmployees" class="boxline count-line"></span> 人，其他人士 <span id="pDeathOthers" class="boxline count-line"></span> 人，外籍員工/人士 <span id="pDeathForeign" class="boxline count-line"></span> 人)</td>
+            </tr>
+            <tr>
+              <td class="casualty-row">失蹤 <span id="pMissingTotal" class="boxline count-line"></span> 人(員工 <span id="pMissingEmployees" class="boxline count-line"></span> 人，其他人士 <span id="pMissingOthers" class="boxline count-line"></span> 人，外籍員工/人士 <span id="pMissingForeign" class="boxline count-line"></span> 人)</td>
+            </tr>
+            <tr>
+              <td class="casualty-row">受傷 <span id="pInjuryTotal" class="boxline count-line"></span> 人(員工 <span id="pInjuryEmployees" class="boxline count-line"></span> 人，其他人士 <span id="pInjuryOthers" class="boxline count-line"></span> 人，外籍員工/人士 <span id="pInjuryForeign" class="boxline count-line"></span> 人)</td>
+            </tr>
+            <tr>
+              <td class="small-label">環境<br>影響</td>
+              <td>
+                <span id="pAirPollution"></span>空氣污染<span id="pWaterPollution"></span>水污染<span id="pOtherPollution"></span>其他<span id="pOtherPollutionText"></span><br>
+                影響範圍：<span id="pEnvironmentScope"></span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">處理情形及預計排除或處理完畢時間</td>
+              <td class="multiline large-text"><span id="pHandling"></span></td>
+            </tr>
+            <tr>
+              <td colspan="2" class="label-col">備註<br>(如特殊情形或訴求事項)</td>
+              <td class="multiline"><span id="pRemarks"></span></td>
+            </tr>
+            <tr>
+              <td colspan="3">★含本頁及其他傳真資料共( <span id="pTotalPages"></span> )頁</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="official-footer">
+          <div>承辦人：<span id="pHandler"></span></div>
+          <div>電話：<span id="pPhone"></span></div>
+          <div>分機 <span id="pExtension"></span></div>
+          <div>手機 <span id="pMobile"></span></div>
+          <div class="supervisor-line">單位主管：<span id="pSupervisor"></span></div>
+        </div>
+        <div class="page-number">1/2</div>
+      </article>
+      <article class="paper second-page">
+        <h2 class="official-title">電業事故速報表</h2>
+        <div class="notes">
+          <p class="notes-title">注意事項：</p>
+          <p>一、速報表提報時間：</p>
+          <p>（一）初報：電業應於知悉或接獲通知後１小時內以傳真或經各級主管機關指定之其他通訊方式傳送至各級主管機關。</p>
+          <p>（二）續報：如非短期所能排除或處理完畢而須持續彙報者，應於每日下午３時提報最新進展至各級主管機關(為密切掌握災情演變，得視實際需求調整每日提報次數)。</p>
+          <p>（三）結報：電業事故排除或處理完畢後，以各級主管機關指定之通訊方式提報至各級主管機關。</p>
+          <p>二、請各電業定期更新災害緊急通報資訊，俾確實完成通報作業。</p>
+        </div>
+        <div class="page-number">2/2</div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const MAIL_RECIPIENT = "manda.liu@imperialenergy.com.tw";
+    const EXPORT_ENDPOINT = "/api/export-and-email";
+    const EXPORT_DIR_LABEL = "\\\\192.168.1.17\\Sean\\公司_節能屋\\速報表";
+    const STORAGE_KEY = "electricityIncidentReportDraft.v1";
+    const UTILITY_OPTIONS = ["節能屋能源科技股份有限公司", "華國能源股份有限公司"];
+    const DEFAULT_UTILITY_NAME = UTILITY_OPTIONS[0];
+    const UTILITY_PROFILES = {
+      "節能屋能源科技股份有限公司": {
+        siteName: "嘉義縣民雄鄉頭橋工業區工業二路1號",
+        handler: "劉雅芸",
+        phone: "(02)2595-5966",
+        extension: "619",
+        mobile: "0910380996",
+        supervisor: "伍允嘉",
+        storageCapacity: "3"
+      },
+      "華國能源股份有限公司": {
+        siteName: "雲林縣斗六市光明段217地號",
+        handler: "康睿溢",
+        phone: "(02)2595-5966",
+        extension: "608",
+        mobile: "0988897607",
+        supervisor: "伍允嘉",
+        storageCapacity: "5"
+      }
+    };
+    const ids = [
+      "utilityName", "awareTime", "occurredTime", "incidentName", "siteName", "otherCategory",
+      "cause", "generationCapacity", "storageCapacity", "substationCount", "feederCapacity",
+      "outageHouseholds", "deathEmployees", "deathOthers", "deathForeign", "missingEmployees",
+      "missingOthers", "missingForeign", "injuryEmployees", "injuryOthers", "injuryForeign",
+      "otherPollutionText", "environmentScope", "handling", "remarks", "totalPages", "handler",
+      "phone", "extension", "mobile", "supervisor", "followCount", "noUpdateMode"
+    ];
+
+    const boxes = [
+      "initialReport", "followReport", "finalReport", "hasExplosion", "hasFire",
+      "hasHighPressureLeak", "hasFlammableLeak", "dispatchPartial", "dispatchFull",
+      "airPollution", "waterPollution", "otherPollution"
+    ];
+
+    const samples = {
+      wetai: {
+        utilityName: "瑋泰能源股份有限公司",
+        awareTime: "2026-06-10T09:56",
+        occurredTime: "2026-06-10T09:56",
+        incidentName: "瑋泰能源股份有限公司儲能案場",
+        siteName: "彰化縣鹿港鎮鹿海段彰濱工業園區\n瑋泰能源股份有限公司儲能案場",
+        category: "設備運轉事故",
+        scale: "丙級規模",
+        cause: "高壓盤 DS 高壓側 FROM 線路異常，T.P.C 有短路現象，R、S 向高壓電纜絕緣異常接點，雨天濕氣與電纜接點及絕緣礙子氧化現象，進而送電後電弧串繞 R、S 短路。",
+        generationCapacity: "4.9MW",
+        outageHouseholds: "無",
+        environmentScope: "無",
+        handling: "儲能相關設施停止運轉，聯繫中源電機顧問公司安排到場進行事故設備檢查。因 06/08 至 06/21 天氣預報及現場環境皆是陰雨持續，預計 06/22 才可進行高壓電力檢查，待確認損壞內容另行備料更換，修繕更換後再進行二次設施高壓檢，確認無異常後以合格報告書呈報台電確認安排送電，預計 06/30 前完成。",
+        handler: "李明霖",
+        phone: "04-22546885",
+        extension: "6229 / 0929141413",
+        totalPages: "1"
+      },
+      aidc: {
+        utilityName: "漢翔航空工業股份有限公司",
+        awareTime: "2026-06-07T05:40",
+        occurredTime: "2026-06-07T05:45",
+        incidentName: "沙南與沙北兩案場 EMS 打點程式異常",
+        siteName: "1. 沙南案場：台中市沙鹿區中清路 16 地號\n2. 沙北案場：台中市沙鹿區公館段 441-20 地號",
+        category: "設備運轉事故",
+        scale: "丙級規模",
+        finalReport: true,
+        cause: "EMS 程式打點異常導致電力交易處於失分狀態，進而致電力交易平台停止交易。",
+        storageCapacity: "10MW",
+        outageHouseholds: "無",
+        environmentScope: "無",
+        handling: "請台達電工程師遠端維修 EMS 系統，本日 06/07 下午 16:00 會回復交易。",
+        handler: "李俊賢",
+        phone: "04-27020001",
+        extension: "2873 / 0982260125",
+        totalPages: "1"
+      }
+    };
+
+    const el = id => document.getElementById(id);
+    const val = id => el(id)?.value.trim() || "";
+    const checked = id => Boolean(el(id)?.checked);
+    const radioValue = name => document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+
+    function setUtilityName(value) {
+      el("utilityName").value = UTILITY_OPTIONS.includes(value) ? value : DEFAULT_UTILITY_NAME;
+      syncIncidentNameToUtility();
+    }
+
+    function syncIncidentNameToUtility() {
+      el("incidentName").value = val("utilityName") || DEFAULT_UTILITY_NAME;
+    }
+
+    function applyUtilityProfile(options = {}) {
+      const profile = UTILITY_PROFILES[val("utilityName")] || UTILITY_PROFILES[DEFAULT_UTILITY_NAME];
+      el("siteName").value = profile.siteName;
+      el("handler").value = profile.handler;
+      el("phone").value = profile.phone;
+      el("extension").value = profile.extension;
+      el("mobile").value = profile.mobile;
+      el("supervisor").value = profile.supervisor;
+      if (options.forceStorageCapacity || !val("storageCapacity")) {
+        el("storageCapacity").value = profile.storageCapacity;
+      }
+    }
+
+    function currentLocalDateTimeValue() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const h = String(now.getHours()).padStart(2, "0");
+      const min = String(now.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${d}T${h}:${min}`;
+    }
+
+    function setReportTimeToNow() {
+      el("awareTime").value = currentLocalDateTimeValue();
+    }
+
+    function refreshReportTimeForAction() {
+      setReportTimeToNow();
+      if (checked("initialReport") && !checked("followReport") && !checked("finalReport")) {
+        el("occurredTime").value = val("awareTime");
+      } else if (!val("occurredTime")) {
+        el("occurredTime").value = val("awareTime");
+      }
+      syncPreview();
+    }
+
+    function setText(id, text) {
+      el(id).textContent = text || "";
+    }
+
+    function mark(isChecked) {
+      return `<span class="checkmark">${isChecked ? "■" : "□"}</span>`;
+    }
+
+    function setMark(id, isChecked) {
+      el(id).innerHTML = mark(isChecked);
+    }
+
+    function parseLocalDateTime(value) {
+      if (!value) return null;
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function formatDateTime(value) {
+      const date = parseLocalDateTime(value);
+      if (!date) return "";
+      const y = date.getFullYear() - 1911;
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const h = String(date.getHours()).padStart(2, "0");
+      const min = String(date.getMinutes()).padStart(2, "0");
+      return `${y} 年 ${m} 月 ${d} 日 ${h} 時 ${min} 分`;
+    }
+
+    function n(id) {
+      const raw = val(id);
+      if (raw === "") return 0;
+      const num = Number(raw);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function total(prefix) {
+      return n(`${prefix}Employees`) + n(`${prefix}Others`) + n(`${prefix}Foreign`);
+    }
+
+    function selectedSiteShort() {
+      const first = val("siteName").split(/\n/).map(s => s.trim()).find(Boolean);
+      return first || "案場";
+    }
+
+    function getReportTypeText() {
+      const parts = [];
+      if (checked("initialReport")) parts.push("初報");
+      if (checked("followReport")) parts.push(`續報第${val("followCount") || "__"}次`);
+      if (checked("finalReport")) parts.push("結報");
+      return parts.join("、") || "速報";
+    }
+
+    function normalizeReportType() {
+      const selected = document.querySelector('input[name="reportType"]:checked');
+      if (!selected) {
+        el("initialReport").checked = true;
+      }
+    }
+
+    function hasFastNoticeCondition() {
+      return radioValue("category") === "設備運轉事故" &&
+        (checked("hasExplosion") || checked("hasFire") || checked("hasHighPressureLeak") || checked("hasFlammableLeak"));
+    }
+
+    function updateDeadlineStatus() {
+      const status = el("deadlineStatus");
+      const aware = parseLocalDateTime(val("awareTime"));
+      const scale = radioValue("scale");
+      const fast = hasFastNoticeCondition();
+      status.className = "status";
+      if (fast) {
+        status.classList.add("fast");
+        status.textContent = "設備運轉事故涉及爆炸、火災、高壓氣體洩漏或可燃氣體洩漏時，丙級需比照乙級時限：15 分鐘內先通知。";
+        return;
+      }
+      if (!aware) {
+        status.textContent = "丙級事故：知悉或接獲通知後 1 小時內完成速報並寄送測試信箱。";
+        return;
+      }
+      const elapsedMinutes = Math.floor((Date.now() - aware.getTime()) / 60000);
+      if (scale === "丙級規模" && elapsedMinutes > 60) {
+        status.classList.add("overdue");
+        status.textContent = `已超過知悉時間 ${elapsedMinutes} 分鐘；仍可產出速報表，但請留意 1 小時通報時限。`;
+      } else if (scale === "丙級規模" && elapsedMinutes >= 0) {
+        status.textContent = `距知悉時間已 ${elapsedMinutes} 分鐘；丙級事故需於 1 小時內完成速報並寄送測試信箱。`;
+      } else {
+        status.textContent = "請確認知悉時間；丙級事故需於知悉或接獲通知後 1 小時內完成速報。";
+      }
+    }
+
+    function syncPreview() {
+      normalizeReportType();
+      el("totalPages").value = "1";
+      setText("pUtilityName", val("utilityName"));
+      setText("pAwareTime", formatDateTime(val("awareTime")));
+      setText("pOccurredTime", formatDateTime(val("occurredTime")));
+      setText("pIncidentName", val("incidentName"));
+      setText("pSiteName", val("siteName"));
+      setText("pOtherCategory", val("otherCategory") ? `_________${val("otherCategory")}` : "_________");
+      setText("pCause", val("cause"));
+      setText("pGenerationCapacity", val("generationCapacity"));
+      setText("pStorageCapacity", val("storageCapacity"));
+      setText("pSubstationCount", val("substationCount"));
+      setText("pFeederCapacity", val("feederCapacity"));
+      setText("pOutageHouseholds", val("outageHouseholds"));
+      setText("pEnvironmentScope", val("environmentScope"));
+      setText("pHandling", val("handling"));
+      setText("pRemarks", val("remarks"));
+      setText("pTotalPages", val("totalPages"));
+      setText("pHandler", val("handler"));
+      setText("pPhone", val("phone"));
+      setText("pExtension", val("extension"));
+      setText("pMobile", val("mobile"));
+      setText("pSupervisor", val("supervisor"));
+      setText("pFollowCount", val("followCount") || "__");
+
+      const category = radioValue("category");
+      setMark("pCatEquipment", category === "設備運轉事故");
+      setMark("pCatSafety", category === "工安衛生事故");
+      setMark("pCatEnvironment", category === "環境影響事故");
+      setMark("pCatLabor", category === "勞資爭議事故");
+      setMark("pCatOther", category === "其他重大事故");
+
+      const scale = radioValue("scale");
+      setMark("pScaleSpecial", scale === "特級規模");
+      setMark("pScaleA", scale === "甲級規模");
+      setMark("pScaleB", scale === "乙級規模");
+      setMark("pScaleC", scale === "丙級規模");
+
+      setMark("pInitialReport", checked("initialReport"));
+      setMark("pFollowReport", checked("followReport"));
+      setMark("pFinalReport", checked("finalReport"));
+      setMark("pGenCheck", Boolean(val("generationCapacity")));
+      setMark("pStorageCheck", Boolean(val("storageCapacity")));
+      setMark("pSubstationCheck", Boolean(val("substationCount")));
+      setMark("pDispatchPartial", checked("dispatchPartial"));
+      setMark("pDispatchFull", checked("dispatchFull"));
+      setMark("pFeederCheck", Boolean(val("feederCapacity")));
+      setMark("pAirPollution", checked("airPollution"));
+      setMark("pWaterPollution", checked("waterPollution"));
+      setMark("pOtherPollution", checked("otherPollution"));
+      setText("pOtherPollutionText", val("otherPollutionText") ? `___${val("otherPollutionText")}` : "___");
+
+      setText("pDeathEmployees", val("deathEmployees"));
+      setText("pDeathOthers", val("deathOthers"));
+      setText("pDeathForeign", val("deathForeign"));
+      setText("pDeathTotal", total("death") || "");
+      setText("pMissingEmployees", val("missingEmployees"));
+      setText("pMissingOthers", val("missingOthers"));
+      setText("pMissingForeign", val("missingForeign"));
+      setText("pMissingTotal", total("missing") || "");
+      setText("pInjuryEmployees", val("injuryEmployees"));
+      setText("pInjuryOthers", val("injuryOthers"));
+      setText("pInjuryForeign", val("injuryForeign"));
+      setText("pInjuryTotal", total("injury") || "");
+
+      updateDeadlineStatus();
+      saveDraft();
+      fitPreviewToScreen();
+    }
+
+    function clearPreviewFit() {
+      document.querySelectorAll(".paper").forEach(paper => {
+        paper.style.transform = "";
+        paper.style.marginBottom = "";
+      });
+    }
+
+    function fitPreviewToScreen() {
+      const shell = document.querySelector(".preview-shell");
+      const papers = Array.from(document.querySelectorAll(".paper"));
+      if (!shell || !papers.length) return;
+      clearPreviewFit();
+      if (!window.matchMedia("(max-width: 620px)").matches) return;
+      const paperWidth = papers[0].offsetWidth;
+      const availableWidth = Math.max(shell.clientWidth - 4, 280);
+      if (!paperWidth) return;
+      const scale = Math.min(1, availableWidth / paperWidth);
+      papers.forEach(paper => {
+        paper.style.transform = `scale(${scale})`;
+        const visualGap = 20;
+        paper.style.marginBottom = `${Math.round((paper.offsetHeight * scale) - paper.offsetHeight + visualGap)}px`;
+      });
+    }
+
+    function saveDraft() {
+      const data = {};
+      ids.forEach(id => {
+        if (el(id)) data[id] = el(id).value;
+      });
+      boxes.forEach(id => {
+        if (el(id)) data[id] = el(id).checked;
+      });
+      data.category = radioValue("category");
+      data.scale = radioValue("scale");
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      } catch (error) {
+        // Local storage can be unavailable in some locked-down browser modes.
+      }
+    }
+
+    function validateForm(show = true) {
+      const missing = [];
+      document.querySelectorAll("[data-required]").forEach(input => {
+        if (!input.value.trim()) missing.push(input.dataset.required);
+      });
+      if (!radioValue("category")) missing.push("事故類別");
+      if (!radioValue("scale")) missing.push("事故規模");
+      if (!checked("initialReport") && !checked("followReport") && !checked("finalReport")) {
+        missing.push("通報別");
+      }
+      if (checked("followReport") && !val("followCount")) {
+        missing.push("續報次數");
+      }
+      const errors = el("errors");
+      if (show) {
+        if (missing.length) {
+          errors.classList.add("show");
+          errors.innerHTML = `<strong>請補齊必填欄位</strong><ul>${missing.map(item => `<li>${item}</li>`).join("")}</ul>`;
+        } else {
+          errors.classList.remove("show");
+          errors.innerHTML = "";
+        }
+      }
+      return missing.length === 0;
+    }
+
+    function emailBody() {
+      const casualty = total("death") || total("missing") || total("injury")
+        ? `傷亡：死亡 ${total("death") || 0}、失蹤 ${total("missing") || 0}、受傷 ${total("injury") || 0} 人`
+        : "";
+      const environment = val("environmentScope") ? `環境影響：${val("environmentScope")}` : "";
+      const lines = [
+        "您好：",
+        "",
+        "檢送電業事故速報表，請參閱附件。",
+        "",
+        `電業：${val("utilityName")}`,
+        `案場：${selectedSiteShort()}`,
+        `通報：${getReportTypeText()} / ${radioValue("scale")}`,
+        `發生時間：${formatDateTime(val("occurredTime"))}`,
+        `原因：${val("cause") || "詳附件"}`,
+        `處理：${val("handling") || "詳附件"}`,
+      ].filter(Boolean);
+      if (val("outageHouseholds")) lines.push(`停電戶數：${val("outageHouseholds")}`);
+      if (casualty) lines.push(casualty);
+      if (environment) lines.push(environment);
+      if (el("noUpdateMode")?.value === "1") {
+        lines.push("本次續報無更新，案件尚未結案。");
+      }
+      lines.push(
+        "",
+        `承辦：${val("handler")} ${val("phone")}${val("extension") ? " 分機 " + val("extension") : ""}${val("mobile") ? " / " + val("mobile") : ""}`
+      );
+      return lines.join("\n");
+    }
+
+    function showMessage(message, type = "info") {
+      const box = el("errors");
+      box.className = `errors show ${type === "info" ? "info" : ""}`.trim();
+      box.textContent = message;
+    }
+
+    function clearMessage() {
+      const box = el("errors");
+      box.className = "errors";
+      box.textContent = "";
+    }
+
+    function buildExportHtml() {
+      const styles = Array.from(document.querySelectorAll("style")).map(style => style.textContent).join("\n");
+      const preview = document.querySelector(".preview-shell").cloneNode(true);
+      preview.querySelectorAll(".screen-only").forEach(node => node.remove());
+      return `<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <title>電業事故速報表</title>
+  <style>
+${styles}
+    body { background: #fff; }
+    .preview-shell { height: auto; overflow: visible; padding: 0; background: #fff; }
+    .paper { box-shadow: none; margin: 0 auto 18px; }
+    @page { size: A4; margin: 0; }
+  </style>
+</head>
+<body>
+  <section class="preview-shell">${preview.innerHTML}</section>
+</body>
+</html>`;
+    }
+
+    function openMailDraft(options = {}) {
+      if (!options.noUpdate) {
+        el("noUpdateMode").value = "0";
+      }
+      refreshReportTimeForAction();
+      syncPreview();
+      const suffix = options.noUpdate ? "｜無更新" : "";
+      const subject = `電業事故速報表｜${val("utilityName") || "電業"}｜${selectedSiteShort()}｜${getReportTypeText()}${suffix}`;
+      showMessage("郵件草稿已開啟，請記得手動附加剛產出的速報表 PDF。", "info");
+      const body = emailBody();
+      const url = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = url;
+    }
+
+    function printReport() {
+      refreshReportTimeForAction();
+      clearPreviewFit();
+      window.print();
+      window.setTimeout(fitPreviewToScreen, 300);
+    }
+
+    function resetForm() {
+      ids.forEach(id => {
+        if (el(id)) el(id).value = "";
+      });
+      setUtilityName(DEFAULT_UTILITY_NAME);
+      applyUtilityProfile();
+      setReportTimeToNow();
+      el("occurredTime").value = val("awareTime");
+      boxes.forEach(id => {
+        if (el(id)) el(id).checked = false;
+      });
+      document.querySelector('input[name="category"][value="設備運轉事故"]').checked = true;
+      document.querySelector('input[name="scale"][value="丙級規模"]').checked = true;
+      el("initialReport").checked = true;
+      el("noUpdateMode").value = "0";
+      clearMessage();
+      syncPreview();
+    }
+
+    function setReportAsNoUpdateFollow() {
+      const current = Number(val("followCount"));
+      el("initialReport").checked = false;
+      el("followReport").checked = true;
+      el("finalReport").checked = false;
+      el("followCount").value = Number.isFinite(current) && current > 0 ? String(current + 1) : "1";
+      el("noUpdateMode").value = "1";
+      setReportTimeToNow();
+      clearMessage();
+      syncPreview();
+      openMailDraft({ noUpdate: true });
+    }
+
+    function applySample(sample) {
+      resetForm();
+      Object.entries(sample).forEach(([key, value]) => {
+        if (key === "category") {
+          document.querySelector(`input[name="category"][value="${value}"]`).checked = true;
+        } else if (key === "scale") {
+          document.querySelector(`input[name="scale"][value="${value}"]`).checked = true;
+        } else if (key === "utilityName") {
+          setUtilityName(value);
+          applyUtilityProfile();
+        } else if (key === "incidentName") {
+          syncIncidentNameToUtility();
+        } else if (key === "finalReport") {
+          el("finalReport").checked = Boolean(value);
+        } else if (el(key)) {
+          el(key).value = value;
+        }
+      });
+      syncPreview();
+    }
+
+    function loadDraft() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        ids.forEach(id => {
+          if (el(id) && data[id] != null) el(id).value = data[id];
+        });
+        setUtilityName(data.utilityName);
+        applyUtilityProfile();
+        boxes.forEach(id => {
+          if (el(id) && data[id] != null) el(id).checked = Boolean(data[id]);
+        });
+        if (data.finalReport) {
+          el("finalReport").checked = true;
+        } else if (data.followReport) {
+          el("followReport").checked = true;
+        } else {
+          el("initialReport").checked = true;
+        }
+        if (data.category) {
+          const category = document.querySelector(`input[name="category"][value="${data.category}"]`);
+          if (category) category.checked = true;
+        }
+        if (data.scale) {
+          const scale = document.querySelector(`input[name="scale"][value="${data.scale}"]`);
+          if (scale) scale.checked = true;
+        }
+        syncIncidentNameToUtility();
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    [...ids, ...boxes].forEach(id => {
+      const node = el(id);
+      if (node) {
+        node.addEventListener("input", syncPreview);
+        node.addEventListener("change", syncPreview);
+      }
+    });
+    document.querySelectorAll('input[name="category"], input[name="scale"]').forEach(node => {
+      node.addEventListener("change", syncPreview);
+    });
+    el("utilityName").addEventListener("change", () => {
+      syncIncidentNameToUtility();
+      applyUtilityProfile({ forceStorageCapacity: true });
+      syncPreview();
+    });
+
+    el("printBtn").addEventListener("click", printReport);
+    el("printBtn2").addEventListener("click", printReport);
+    el("completeBtn").addEventListener("click", openMailDraft);
+    el("completeBtn2").addEventListener("click", openMailDraft);
+    el("noUpdateFollowBtn").addEventListener("click", setReportAsNoUpdateFollow);
+    el("clearBtn").addEventListener("click", resetForm);
+    if (loadDraft()) {
+      syncPreview();
+    } else {
+      resetForm();
+    }
+    window.addEventListener("resize", fitPreviewToScreen);
+    window.addEventListener("orientationchange", () => window.setTimeout(fitPreviewToScreen, 250));
+    window.addEventListener("beforeprint", clearPreviewFit);
+    window.addEventListener("afterprint", fitPreviewToScreen);
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>
