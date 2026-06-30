@@ -547,7 +547,6 @@
       font-size: 13px !important;
       font-weight: 400 !important;
       line-height: 1.34 !important;
-      white-space: nowrap !important;
     }
 
     body.pdf-rendering #paper .official th,
@@ -556,6 +555,13 @@
     body.pdf-rendering #paper .small-label {
       font-weight: 700 !important;
       text-align: center !important;
+      white-space: normal !important;
+      word-break: keep-all !important;
+      overflow-wrap: normal !important;
+    }
+
+    body.pdf-rendering #paper .official td:not(.label-col):not(.small-label):not(.multiline):not(.casualty-row) {
+      white-space: nowrap !important;
     }
 
     body.pdf-rendering #paper .official .multiline,
