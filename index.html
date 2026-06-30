@@ -1183,6 +1183,9 @@
       "injuryOthers",
       "injuryForeign"
     ];
+    const textDefaults = {
+      environmentScope: "無"
+    };
 
     const boxes = [
       "initialReport", "followReport", "finalReport", "hasExplosion", "hasFire",
@@ -1325,6 +1328,17 @@
       zeroDefaultIds.forEach(id => {
         if (el(id) && !val(id)) el(id).value = "0";
       });
+    }
+
+    function applyTextDefaults() {
+      Object.entries(textDefaults).forEach(([id, text]) => {
+        if (el(id) && !val(id)) el(id).value = text;
+      });
+    }
+
+    function applyFieldDefaults() {
+      applyZeroDefaults();
+      applyTextDefaults();
     }
 
     function selectedSiteShort() {
@@ -1751,7 +1765,7 @@ ${styles}
       applyUtilityProfile();
       setReportTimeToNow();
       el("occurredTime").value = val("awareTime");
-      applyZeroDefaults();
+      applyFieldDefaults();
       boxes.forEach(id => {
         if (el(id)) el(id).checked = false;
       });
@@ -1826,7 +1840,7 @@ ${styles}
           if (scale) scale.checked = true;
         }
         syncIncidentNameToUtility();
-        applyZeroDefaults();
+        applyFieldDefaults();
         return true;
       } catch (error) {
         return false;
