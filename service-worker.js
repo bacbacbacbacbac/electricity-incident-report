@@ -1,4 +1,4 @@
-const CACHE_NAME = "electricity-incident-report-v31";
+const CACHE_NAME = "electricity-incident-report-v32";
 const ASSETS = [
   "/",
   "/index.html",

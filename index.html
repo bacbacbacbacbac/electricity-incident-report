@@ -1372,6 +1372,12 @@
       return parts.join("、") || "速報";
     }
 
+    function currentReportKind() {
+      if (checked("finalReport")) return "final";
+      if (checked("followReport")) return "follow";
+      return "initial";
+    }
+
     function normalizeReportType() {
       const selected = document.querySelector('input[name="reportType"]:checked');
       if (!selected) {
@@ -1555,29 +1561,53 @@
       return missing.length === 0;
     }
 
-    function emailBody() {
-      const casualty = total("death") || total("missing") || total("injury")
-        ? `傷亡：死亡 ${total("death") || 0}、失蹤 ${total("missing") || 0}、受傷 ${total("injury") || 0} 人`
-        : "";
+    function emailSubject(options = {}) {
+      const suffix = options.noUpdate ? "｜無更新" : "";
+      return `電業事故速報表｜${val("utilityName") || "電業"}｜${selectedSiteShort()}｜${getReportTypeText()}${suffix}`;
+    }
+
+    function commonEmailLines() {
+      const casualty = `傷亡：死亡 ${total("death")}、失蹤 ${total("missing")}、受傷 ${total("injury")} 人`;
       const environment = val("environmentScope") ? `環境影響：${val("environmentScope")}` : "";
-      const lines = [
-        "您好：",
-        "",
-        "檢送電業事故速報表，請參閱附件。",
-        "",
+      return [
         `電業：${val("utilityName")}`,
         `案場：${selectedSiteShort()}`,
         `通報：${getReportTypeText()} / ${radioValue("scale")}`,
         `發生時間：${formatDateTime(val("occurredTime"))}`,
         `原因：${val("cause") || "詳附件"}`,
         `處理：${val("handling") || "詳附件"}`,
+        `停電戶數：${val("outageHouseholds") || "無"}`,
+        casualty,
+        environment
       ].filter(Boolean);
-      if (val("outageHouseholds")) lines.push(`停電戶數：${val("outageHouseholds")}`);
-      if (casualty) lines.push(casualty);
-      if (environment) lines.push(environment);
+    }
+
+    function emailBody(options = {}) {
+      const kind = currentReportKind();
+      const intro = {
+        initial: "檢送本案初報之電業事故速報表，請參閱附件。",
+        follow: "檢送本案續報之電業事故速報表，更新目前事故處理進度，請參閱附件。",
+        final: "檢送本案結報之電業事故速報表，請參閱附件。"
+      }[kind];
+      const note = {
+        initial: "本案後續若有處理進度或重要變更，將再行續報。",
+        follow: `本次為${getReportTypeText()}，後續若有新進度將再行更新。`,
+        final: "本案以本次結報內容為準，後續如有補充資料將另行提供。"
+      }[kind];
+      const lines = [
+        "您好：",
+        "",
+        intro,
+        "",
+        ...commonEmailLines()
+      ];
       if (el("noUpdateMode")?.value === "1") {
         lines.push("本次續報無更新，案件尚未結案。");
       }
+      if (options.noUpdate && kind === "follow") {
+        lines.push("本次續報主要為時限內通報，事故內容暫無新增變更。");
+      }
+      lines.push(note);
       lines.push(
         "",
         `承辦：${val("handler")} ${val("phone")}${val("extension") ? " 分機 " + val("extension") : ""}${val("mobile") ? " / " + val("mobile") : ""}`
@@ -1758,10 +1788,9 @@ ${styles}
       }
       refreshReportTimeForAction();
       syncPreview();
-      const suffix = options.noUpdate ? "｜無更新" : "";
-      const subject = `電業事故速報表｜${val("utilityName") || "電業"}｜${selectedSiteShort()}｜${getReportTypeText()}${suffix}`;
+      const subject = emailSubject(options);
       showMessage("郵件草稿已開啟，請記得手動附加剛產出的速報表 PDF。", "info");
-      const body = emailBody();
+      const body = emailBody(options);
       const url = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       window.location.href = url;
     }
