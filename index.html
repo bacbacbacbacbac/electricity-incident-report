@@ -364,6 +364,10 @@
       grid-template-columns: 1fr 1fr;
     }
 
+    .official-meta > div:last-child {
+      text-align: right;
+    }
+
     .official-footer .supervisor-line {
       grid-column: 1 / -1;
     }
@@ -1178,7 +1182,6 @@
       "phone", "extension", "mobile", "supervisor", "followCount", "noUpdateMode"
     ];
     const zeroDefaultIds = [
-      "outageHouseholds",
       "deathEmployees",
       "deathOthers",
       "deathForeign",
@@ -1190,6 +1193,7 @@
       "injuryForeign"
     ];
     const textDefaults = {
+      outageHouseholds: "無",
       environmentScope: "無"
     };
 
@@ -1454,15 +1458,15 @@
       setText("pDeathEmployees", val("deathEmployees"));
       setText("pDeathOthers", val("deathOthers"));
       setText("pDeathForeign", val("deathForeign"));
-      setText("pDeathTotal", total("death") || "");
+      setText("pDeathTotal", String(total("death")));
       setText("pMissingEmployees", val("missingEmployees"));
       setText("pMissingOthers", val("missingOthers"));
       setText("pMissingForeign", val("missingForeign"));
-      setText("pMissingTotal", total("missing") || "");
+      setText("pMissingTotal", String(total("missing")));
       setText("pInjuryEmployees", val("injuryEmployees"));
       setText("pInjuryOthers", val("injuryOthers"));
       setText("pInjuryForeign", val("injuryForeign"));
-      setText("pInjuryTotal", total("injury") || "");
+      setText("pInjuryTotal", String(total("injury")));
 
       updateDeadlineStatus();
       saveDraft();
