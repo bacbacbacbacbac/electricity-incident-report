@@ -511,6 +511,7 @@
       box-shadow: none !important;
       transform: none !important;
       margin: 0 !important;
+      font-family: "Times New Roman", "DFKai-SB", "BiauKai", "標楷體", "PMingLiU", serif !important;
     }
 
     .hidden-field {
@@ -1551,6 +1552,23 @@ ${styles}
         });
         const pageWidth = 210;
         const pageHeight = 297;
+        const fullImageHeight = canvas.height * pageWidth / canvas.width;
+        const singlePageTolerance = pageHeight * 1.08;
+
+        if (fullImageHeight <= singlePageTolerance) {
+          pdf.addImage(
+            canvas.toDataURL("image/jpeg", 0.96),
+            "JPEG",
+            0,
+            0,
+            pageWidth,
+            Math.min(fullImageHeight, pageHeight)
+          );
+          pdf.save(pdfFileName());
+          showMessage("乾淨 PDF 已產生。若手機未跳出下載，請查看 Safari 下載項目。", "info");
+          return;
+        }
+
         const sliceHeight = Math.floor(canvas.width * pageHeight / pageWidth);
         let offsetY = 0;
         let pageIndex = 0;
