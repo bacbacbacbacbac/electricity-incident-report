@@ -852,7 +852,7 @@
       <div class="topbar">
         <div>
           <h1>電業事故速報表</h1>
-          <p class="subtle">測試收件：manda.liu@imperialenergy.com.tw</p>
+          <p class="subtle">官方收件：itri.moeaboe@gmail.com</p>
         </div>
       </div>
 
@@ -1159,7 +1159,7 @@
   </main>
 
   <script>
-    const MAIL_RECIPIENT = "manda.liu@imperialenergy.com.tw";
+    const MAIL_RECIPIENT = "itri.moeaboe@gmail.com";
     const EXPORT_ENDPOINT = "/api/export-and-email";
     const EXPORT_DIR_LABEL = "\\\\192.168.1.17\\Sean\\公司_節能屋\\速報表";
     const STORAGE_KEY = "electricityIncidentReportDraft.v1";
@@ -1417,7 +1417,7 @@
         return;
       }
       if (!aware) {
-        status.textContent = "丙級事故：知悉或接獲通知後 1 小時內完成速報並寄送測試信箱。";
+        status.textContent = "丙級事故：知悉或接獲通知後 1 小時內完成速報並寄送官方信箱。";
         return;
       }
       const elapsedMinutes = Math.floor((Date.now() - aware.getTime()) / 60000);
@@ -1425,7 +1425,7 @@
         status.classList.add("overdue");
         status.textContent = `已超過知悉時間 ${elapsedMinutes} 分鐘；仍可產出速報表，但請留意 1 小時通報時限。`;
       } else if (scale === "丙級規模" && elapsedMinutes >= 0) {
-        status.textContent = `距知悉時間已 ${elapsedMinutes} 分鐘；丙級事故需於 1 小時內完成速報並寄送測試信箱。`;
+        status.textContent = `距知悉時間已 ${elapsedMinutes} 分鐘；丙級事故需於 1 小時內完成速報並寄送官方信箱。`;
       } else {
         status.textContent = "請確認知悉時間；丙級事故需於知悉或接獲通知後 1 小時內完成速報。";
       }
