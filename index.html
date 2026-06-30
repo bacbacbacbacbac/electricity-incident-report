@@ -556,8 +556,9 @@
       font-weight: 700 !important;
       text-align: center !important;
       white-space: normal !important;
-      word-break: keep-all !important;
-      overflow-wrap: normal !important;
+      word-break: normal !important;
+      overflow-wrap: anywhere !important;
+      line-break: anywhere !important;
     }
 
     body.pdf-rendering #paper .official td:not(.label-col):not(.small-label):not(.multiline):not(.casualty-row) {
@@ -1056,7 +1057,7 @@
               </td>
             </tr>
             <tr>
-              <td colspan="2" class="label-col">發生地點及案場名稱</td>
+              <td colspan="2" class="label-col">發生地點及<br>案場名稱</td>
               <td class="multiline"><span id="pSiteName"></span></td>
             </tr>
             <tr>
@@ -1106,7 +1107,7 @@
               </td>
             </tr>
             <tr>
-              <td colspan="2" class="label-col">處理情形及預計排除或處理完畢時間</td>
+              <td colspan="2" class="label-col">處理情形及<br>預計排除或<br>處理完畢時間</td>
               <td class="multiline large-text"><span id="pHandling"></span></td>
             </tr>
             <tr>
