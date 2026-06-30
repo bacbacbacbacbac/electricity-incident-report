@@ -1171,6 +1171,18 @@
       "otherPollutionText", "environmentScope", "handling", "remarks", "totalPages", "handler",
       "phone", "extension", "mobile", "supervisor", "followCount", "noUpdateMode"
     ];
+    const zeroDefaultIds = [
+      "outageHouseholds",
+      "deathEmployees",
+      "deathOthers",
+      "deathForeign",
+      "missingEmployees",
+      "missingOthers",
+      "missingForeign",
+      "injuryEmployees",
+      "injuryOthers",
+      "injuryForeign"
+    ];
 
     const boxes = [
       "initialReport", "followReport", "finalReport", "hasExplosion", "hasFire",
@@ -1307,6 +1319,12 @@
 
     function total(prefix) {
       return n(`${prefix}Employees`) + n(`${prefix}Others`) + n(`${prefix}Foreign`);
+    }
+
+    function applyZeroDefaults() {
+      zeroDefaultIds.forEach(id => {
+        if (el(id) && !val(id)) el(id).value = "0";
+      });
     }
 
     function selectedSiteShort() {
@@ -1733,6 +1751,7 @@ ${styles}
       applyUtilityProfile();
       setReportTimeToNow();
       el("occurredTime").value = val("awareTime");
+      applyZeroDefaults();
       boxes.forEach(id => {
         if (el(id)) el(id).checked = false;
       });
@@ -1807,6 +1826,7 @@ ${styles}
           if (scale) scale.checked = true;
         }
         syncIncidentNameToUtility();
+        applyZeroDefaults();
         return true;
       } catch (error) {
         return false;
