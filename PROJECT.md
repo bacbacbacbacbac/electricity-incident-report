@@ -86,6 +86,10 @@ Vercel 部署用資料夾：
 - 若修改 PWA 快取或靜態資產，更新 `vercel-deploy\service-worker.js` 的 `CACHE_NAME`，避免手機繼續使用舊版。
 - 若要讓線上網址更新，需再部署到 Vercel。
 
+## 部署測試紀錄
+
+- 2026-06-30 14:13:12 +08:00：加入不影響畫面的 `deployment-test` meta 標記，用來確認 GitHub push 後 Vercel 是否會自動部署。
+
 ## 部署注意事項
 
 每次修改後，需要把新版檔案部署到 Vercel，線上網址才會更新。
