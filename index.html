@@ -215,22 +215,6 @@
       text-align: center;
     }
 
-    .outage-field {
-      grid-column: 1 / span 2;
-      display: grid;
-      grid-template-columns: 58px 96px;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .outage-field {
-      justify-self: start;
-    }
-
-    .outage-field > span {
-      text-align: right;
-    }
-
     .grid.impact-grid .field:not(.full) {
       align-items: center;
       text-align: center;
@@ -268,6 +252,19 @@
 
     .field.full {
       grid-column: 1 / -1;
+    }
+
+    .grid.impact-grid .outage-field {
+      grid-column: 1 / span 2;
+      display: grid;
+      grid-template-columns: 58px 96px;
+      align-items: center;
+      justify-self: start;
+      gap: 10px;
+    }
+
+    .grid.impact-grid .outage-field > span {
+      text-align: right;
     }
 
     label,
