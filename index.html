@@ -254,6 +254,14 @@
       cursor: default;
     }
 
+    input:disabled,
+    textarea:disabled,
+    select:disabled {
+      background: #f1f3f4;
+      color: #8a8f94;
+      cursor: not-allowed;
+    }
+
     textarea.fixed-display {
       resize: none;
     }
@@ -1371,6 +1379,12 @@
       }
     }
 
+    function updateFollowCountState() {
+      const input = el("followCount");
+      if (!input) return;
+      input.disabled = !checked("followReport");
+    }
+
     function hasFastNoticeCondition() {
       return radioValue("category") === "設備運轉事故" &&
         (checked("hasExplosion") || checked("hasFire") || checked("hasHighPressureLeak") || checked("hasFlammableLeak"));
@@ -1404,6 +1418,7 @@
 
     function syncPreview() {
       normalizeReportType();
+      updateFollowCountState();
       el("totalPages").value = "1";
       setText("pUtilityName", val("utilityName"));
       setText("pAwareTime", formatDateTime(val("awareTime")));
@@ -1426,7 +1441,7 @@
       setText("pExtension", val("extension"));
       setText("pMobile", val("mobile"));
       setText("pSupervisor", val("supervisor"));
-      setText("pFollowCount", val("followCount") || "__");
+      setText("pFollowCount", checked("followReport") ? (val("followCount") || "__") : "__");
 
       const category = radioValue("category");
       setMark("pCatEquipment", category === "設備運轉事故");
