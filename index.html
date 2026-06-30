@@ -503,6 +503,16 @@
       display: none;
     }
 
+    body.pdf-rendering .page-number {
+      display: none !important;
+    }
+
+    body.pdf-rendering #paper {
+      box-shadow: none !important;
+      transform: none !important;
+      margin: 0 !important;
+    }
+
     .hidden-field {
       display: none;
     }
@@ -1466,6 +1476,120 @@ ${styles}
 </html>`;
     }
 
+    const PDF_SCRIPT_URLS = [
+      "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js",
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    ];
+
+    function loadScriptOnce(src) {
+      return new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[src="${src}"]`);
+        if (existing) {
+          existing.addEventListener("load", resolve, { once: true });
+          existing.addEventListener("error", reject, { once: true });
+          if (existing.dataset.loaded === "1") resolve();
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = src;
+        script.async = true;
+        script.onload = () => {
+          script.dataset.loaded = "1";
+          resolve();
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function ensurePdfLibraries() {
+      if (window.html2canvas && window.jspdf?.jsPDF) return;
+      for (const src of PDF_SCRIPT_URLS) {
+        await loadScriptOnce(src);
+      }
+      if (!window.html2canvas || !window.jspdf?.jsPDF) {
+        throw new Error("PDF libraries unavailable");
+      }
+    }
+
+    function pdfFileName() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const h = String(now.getHours()).padStart(2, "0");
+      const min = String(now.getMinutes()).padStart(2, "0");
+      return `電業事故速報表-${y}${m}${d}-${h}${min}.pdf`;
+    }
+
+    async function exportCleanPdf() {
+      refreshReportTimeForAction();
+      clearPreviewFit();
+      showMessage("正在產生乾淨 PDF，請稍候...", "info");
+      await ensurePdfLibraries();
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      const paper = el("paper");
+      document.body.classList.add("pdf-rendering");
+      try {
+        const canvas = await window.html2canvas(paper, {
+          backgroundColor: "#ffffff",
+          scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
+          useCORS: true,
+          logging: false,
+          windowWidth: paper.scrollWidth,
+          windowHeight: paper.scrollHeight
+        });
+
+        const pdf = new window.jspdf.jsPDF({
+          orientation: "portrait",
+          unit: "mm",
+          format: "a4",
+          compress: true
+        });
+        const pageWidth = 210;
+        const pageHeight = 297;
+        const sliceHeight = Math.floor(canvas.width * pageHeight / pageWidth);
+        let offsetY = 0;
+        let pageIndex = 0;
+
+        while (offsetY < canvas.height) {
+          const currentSliceHeight = Math.min(sliceHeight, canvas.height - offsetY);
+          const slice = document.createElement("canvas");
+          slice.width = canvas.width;
+          slice.height = currentSliceHeight;
+          const context = slice.getContext("2d");
+          context.fillStyle = "#ffffff";
+          context.fillRect(0, 0, slice.width, slice.height);
+          context.drawImage(
+            canvas,
+            0,
+            offsetY,
+            canvas.width,
+            currentSliceHeight,
+            0,
+            0,
+            canvas.width,
+            currentSliceHeight
+          );
+
+          if (pageIndex > 0) pdf.addPage();
+          const imageHeight = currentSliceHeight * pageWidth / canvas.width;
+          pdf.addImage(slice.toDataURL("image/jpeg", 0.96), "JPEG", 0, 0, pageWidth, imageHeight);
+          offsetY += currentSliceHeight;
+          pageIndex += 1;
+        }
+
+        pdf.save(pdfFileName());
+        showMessage("乾淨 PDF 已產生。若手機未跳出下載，請查看 Safari 下載項目。", "info");
+      } finally {
+        document.body.classList.remove("pdf-rendering");
+        fitPreviewToScreen();
+      }
+    }
+
     function openMailDraft(options = {}) {
       if (!options.noUpdate) {
         el("noUpdateMode").value = "0";
@@ -1480,15 +1604,20 @@ ${styles}
       window.location.href = url;
     }
 
-    function printReport() {
-      refreshReportTimeForAction();
-      clearPreviewFit();
-      document.body.classList.add("pdf-export");
-      window.print();
-      window.setTimeout(() => {
-        document.body.classList.remove("pdf-export");
-        fitPreviewToScreen();
-      }, 1000);
+    async function printReport() {
+      try {
+        await exportCleanPdf();
+      } catch (error) {
+        showMessage("無法直接產生 PDF，已改用瀏覽器列印。若使用 iPhone，列印頁尾可能仍會出現。", "info");
+        refreshReportTimeForAction();
+        clearPreviewFit();
+        document.body.classList.add("pdf-export");
+        window.print();
+        window.setTimeout(() => {
+          document.body.classList.remove("pdf-export");
+          fitPreviewToScreen();
+        }, 1000);
+      }
     }
 
     function resetForm() {
