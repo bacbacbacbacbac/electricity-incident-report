@@ -204,6 +204,28 @@
       max-width: 96px;
     }
 
+    #utilityName {
+      width: 286px;
+      max-width: 100%;
+    }
+
+    .stop-grid input:not([type="checkbox"]) {
+      width: 86px;
+      max-width: 100%;
+      text-align: center;
+    }
+
+    .outage-field {
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .grid.impact-grid .field:not(.full) {
+      align-items: center;
+      text-align: center;
+    }
+
     #followCount {
       text-align: center;
     }
@@ -942,7 +964,7 @@
 
       <fieldset>
         <legend>停止運轉</legend>
-        <div class="grid">
+        <div class="grid stop-grid">
           <label class="field">無法發電之裝置容量
             <input id="generationCapacity" placeholder="例：4.9MW">
           </label>
@@ -968,7 +990,7 @@
       <fieldset>
         <legend>衝擊影響程度</legend>
         <div class="grid impact-grid">
-          <label class="field full">停電戶數
+          <label class="field full outage-field">停電戶數
             <input id="outageHouseholds" placeholder="例：無">
           </label>
           <div class="casualty-title">死亡</div>
