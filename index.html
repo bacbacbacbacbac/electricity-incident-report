@@ -1388,7 +1388,9 @@
     function updateFollowCountState() {
       const input = el("followCount");
       if (!input) return;
-      input.disabled = !checked("followReport");
+      const isFollow = checked("followReport");
+      input.disabled = !isFollow;
+      if (!isFollow) input.value = "";
     }
 
     function hasFastNoticeCondition() {
