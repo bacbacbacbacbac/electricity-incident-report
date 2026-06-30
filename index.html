@@ -837,13 +837,6 @@
       <div id="deadlineStatus" class="status"></div>
       <div id="errors" class="errors"></div>
 
-      <div class="actions">
-        <button type="button" id="printBtn">產出 PDF</button>
-        <button class="primary" type="button" id="completeBtn">開啟郵件草稿</button>
-        <button class="warn" type="button" id="noUpdateFollowBtn">無更新續報 +1</button>
-        <button type="button" id="clearBtn">清空</button>
-      </div>
-
       <fieldset>
         <legend>基本資料</legend>
         <div class="grid">
@@ -1836,12 +1829,8 @@ ${styles}
       syncPreview();
     });
 
-    el("printBtn").addEventListener("click", printReport);
     el("printBtn2").addEventListener("click", printReport);
-    el("completeBtn").addEventListener("click", openMailDraft);
     el("completeBtn2").addEventListener("click", openMailDraft);
-    el("noUpdateFollowBtn").addEventListener("click", setReportAsNoUpdateFollow);
-    el("clearBtn").addEventListener("click", resetForm);
     if (loadDraft()) {
       syncPreview();
     } else {
