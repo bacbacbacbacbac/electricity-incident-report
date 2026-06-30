@@ -216,9 +216,19 @@
     }
 
     .outage-field {
+      grid-column: 1 / span 2;
       flex-direction: row;
       align-items: center;
       gap: 10px;
+    }
+
+    .outage-field {
+      justify-self: start;
+    }
+
+    .outage-field > span {
+      width: 58px;
+      text-align: right;
     }
 
     .grid.impact-grid .field:not(.full) {
@@ -990,7 +1000,7 @@
       <fieldset>
         <legend>衝擊影響程度</legend>
         <div class="grid impact-grid">
-          <label class="field full outage-field">停電戶數
+          <label class="field full outage-field"><span>停電戶數</span>
             <input id="outageHouseholds" placeholder="例：無">
           </label>
           <div class="casualty-title">死亡</div>
