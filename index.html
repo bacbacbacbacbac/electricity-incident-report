@@ -183,6 +183,14 @@
       white-space: nowrap;
     }
 
+    .casualty-row-input {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 58px repeat(3, 124px);
+      align-items: end;
+      gap: 8px 14px;
+    }
+
     .grid.impact-grid input[inputmode="numeric"] {
       width: 64px;
       max-width: 64px;
@@ -724,6 +732,11 @@
         gap: 8px;
       }
 
+      .casualty-row-input {
+        grid-template-columns: 42px repeat(3, minmax(78px, 1fr));
+        gap: 8px;
+      }
+
       .grid.impact-grid .field:not(.full) {
         width: auto;
       }
@@ -1000,36 +1013,42 @@
           <label class="field full outage-field"><span>停電戶數</span>
             <input id="outageHouseholds" placeholder="例：無">
           </label>
-          <div class="casualty-title">死亡</div>
-          <label class="field">員工
-            <input id="deathEmployees" inputmode="numeric">
-          </label>
-          <label class="field">其他人士
-            <input id="deathOthers" inputmode="numeric">
-          </label>
-          <label class="field">外籍員工/人士
-            <input id="deathForeign" inputmode="numeric">
-          </label>
-          <div class="casualty-title">失蹤</div>
-          <label class="field">員工
-            <input id="missingEmployees" inputmode="numeric">
-          </label>
-          <label class="field">其他人士
-            <input id="missingOthers" inputmode="numeric">
-          </label>
-          <label class="field">外籍員工/人士
-            <input id="missingForeign" inputmode="numeric">
-          </label>
-          <div class="casualty-title">受傷</div>
-          <label class="field">員工
-            <input id="injuryEmployees" inputmode="numeric">
-          </label>
-          <label class="field">其他人士
-            <input id="injuryOthers" inputmode="numeric">
-          </label>
-          <label class="field">外籍員工/人士
-            <input id="injuryForeign" inputmode="numeric">
-          </label>
+          <div class="casualty-row-input">
+            <div class="casualty-title">死亡</div>
+            <label class="field">員工
+              <input id="deathEmployees" inputmode="numeric">
+            </label>
+            <label class="field">其他人士
+              <input id="deathOthers" inputmode="numeric">
+            </label>
+            <label class="field">外籍員工/人士
+              <input id="deathForeign" inputmode="numeric">
+            </label>
+          </div>
+          <div class="casualty-row-input">
+            <div class="casualty-title">失蹤</div>
+            <label class="field">員工
+              <input id="missingEmployees" inputmode="numeric">
+            </label>
+            <label class="field">其他人士
+              <input id="missingOthers" inputmode="numeric">
+            </label>
+            <label class="field">外籍員工/人士
+              <input id="missingForeign" inputmode="numeric">
+            </label>
+          </div>
+          <div class="casualty-row-input">
+            <div class="casualty-title">受傷</div>
+            <label class="field">員工
+              <input id="injuryEmployees" inputmode="numeric">
+            </label>
+            <label class="field">其他人士
+              <input id="injuryOthers" inputmode="numeric">
+            </label>
+            <label class="field">外籍員工/人士
+              <input id="injuryForeign" inputmode="numeric">
+            </label>
+          </div>
           <div class="field full impact-wide impact-environment">
             <div class="label">環境影響</div>
             <div class="checks compact">
