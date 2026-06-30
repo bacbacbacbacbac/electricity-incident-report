@@ -1,0 +1,105 @@
+# 電業事故速報表專案
+
+## 專案目標
+
+建立一個可在手機與電腦使用的「電業事故速報表」工具。使用者填寫事故資訊後，可以產出符合官方制式表格格式的 PDF，再自行附加到郵件寄給窗口。
+
+目前線上網址：
+
+https://electricity-incident-report-36cw.vercel.app
+
+## 目前使用方式
+
+1. 手機或電腦開啟線上網址。
+2. 填寫速報表欄位。
+3. 按「產出 PDF」。
+4. 儲存 PDF。
+5. 按「開啟郵件草稿」或自行開信箱，手動附加 PDF 後寄出。
+
+## 目前主要功能
+
+- 電業名稱下拉選單：
+  - 節能屋能源科技股份有限公司
+  - 華國能源股份有限公司
+- 依電業名稱自動帶入：
+  - 發生地點及案場名稱
+  - 承辦人
+  - 電話
+  - 分機
+  - 手機
+  - 單位主管
+- 電業知悉時間自動抓製表當下時間。
+- 發生時間維持初報時間，續報不自動覆蓋。
+- 事故規模預設丙級規模。
+- 通報別為單選：
+  - 初報
+  - 續報
+  - 結報
+- 停止運轉預設勾選第二項：
+  - 設置儲能設備之特定電力供應業無法供電容量
+- 預設容量：
+  - 節能屋：3
+  - 華國能源：5
+- 容量欄位可編輯，PDF 中單位顯示 MW。
+- 「無更新續報 +1」可快速產生隔日續報，內容維持不變並增加續報次數。
+- PDF/列印時只輸出速報表本頁。
+- 表格中的「含本頁及其他傳真資料共」固定為 1 頁。
+- 手機 App 圖示使用「速」字圖示。
+
+## 部署資料夾
+
+Vercel 部署用資料夾：
+
+`C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\vercel-deploy`
+
+目前 Vercel 只需要讀取最外層的 `index.html`。
+
+建議一起部署的檔案：
+
+- `index.html`
+- `manifest.webmanifest`
+- `service-worker.js`
+- `apple-touch-icon.png`
+- `icon-192.png`
+- `icon-512.png`
+- `icon.svg`
+
+## 重要檔案
+
+- 本專案記憶：
+  `C:\Users\Manda\Documents\New project\PROJECT.md`
+- 原始專案記憶：
+  `C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\PROJECT.md`
+- 開發版主檔：
+  `C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\outputs\index.html`
+- Vercel 部署版主檔：
+  `C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\vercel-deploy\index.html`
+- 手機 App 設定：
+  `C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\vercel-deploy\manifest.webmanifest`
+- 快取控制：
+  `C:\Users\Manda\Documents\Codex\2026-06-29\new-chat\vercel-deploy\service-worker.js`
+
+## 維護規則
+
+- 後續在本專案 thread 修改功能時，同步更新本檔。
+- 若修改部署版功能，更新 `vercel-deploy\index.html`。
+- 若修改 PWA 快取或靜態資產，更新 `vercel-deploy\service-worker.js` 的 `CACHE_NAME`，避免手機繼續使用舊版。
+- 若要讓線上網址更新，需再部署到 Vercel。
+
+## 部署注意事項
+
+每次修改後，需要把新版檔案部署到 Vercel，線上網址才會更新。
+
+若手機仍顯示舊版：
+
+1. 網址後方加上 `?ts=日期時間`。
+2. 重新整理 Safari。
+3. 若是主畫面 App，刪掉舊捷徑後重新加入主畫面。
+
+## 後續可做項目
+
+- 設定 Vercel Token，讓 Codex 可以直接部署。
+- 建立一鍵部署腳本。
+- 補一份正式的使用手冊。
+- 增加事故紀錄儲存與續報案件管理。
+- 未來做電腦版同格式操作介面。
