@@ -652,14 +652,14 @@
         box-shadow: none;
         break-after: auto;
         page-break-after: auto;
-        break-inside: avoid;
-        page-break-inside: avoid;
+        break-inside: auto;
+        page-break-inside: auto;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
 
-      body.pdf-export .second-page,
-      body.pdf-export .page-number {
+      .preview-shell .second-page,
+      .preview-shell .page-number {
         display: none !important;
       }
 
