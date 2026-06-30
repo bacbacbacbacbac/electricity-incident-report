@@ -217,7 +217,8 @@
 
     .outage-field {
       grid-column: 1 / span 2;
-      flex-direction: row;
+      display: grid;
+      grid-template-columns: 58px 96px;
       align-items: center;
       gap: 10px;
     }
@@ -227,7 +228,6 @@
     }
 
     .outage-field > span {
-      width: 58px;
       text-align: right;
     }
 
