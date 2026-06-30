@@ -622,6 +622,12 @@
         margin: 8mm;
       }
 
+      html,
+      body {
+        height: auto !important;
+        min-height: 0 !important;
+      }
+
       body.pdf-export {
         background: #fff;
       }
@@ -632,49 +638,46 @@
 
       .editor,
       .preview-shell > .actions,
-      .screen-only {
+      .screen-only,
+      .preview-shell .paper:not(#paper),
+      .preview-shell .page-number {
         display: none !important;
       }
 
       .app,
       .preview-shell {
         display: block;
-        height: auto;
-        overflow: visible;
-        padding: 0;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        padding: 0 !important;
       }
 
-      .paper {
-        width: auto;
-        min-height: auto;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        break-after: auto;
-        page-break-after: auto;
+      #paper.paper {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        transform: none !important;
+        break-after: avoid-page !important;
+        page-break-after: avoid !important;
         break-inside: auto;
         page-break-inside: auto;
         print-color-adjust: exact;
         -webkit-print-color-adjust: exact;
       }
 
-      .preview-shell .second-page,
-      .preview-shell .page-number {
-        display: none !important;
-      }
-
-      body.pdf-export .paper {
-        break-after: auto !important;
-        page-break-after: auto !important;
+      .paper + .paper {
+        break-before: auto !important;
+        page-break-before: auto !important;
       }
 
       .casualty-row {
         font-size: 10px;
-      }
-
-      .paper + .paper {
-        break-before: page;
-        page-break-before: always;
       }
 
       .print-only {
@@ -1575,7 +1578,18 @@ ${styles}
     window.addEventListener("afterprint", fitPreviewToScreen);
 
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/service-worker.js").catch(() => {});
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+      navigator.serviceWorker.register("/service-worker.js").then(registration => {
+        registration.update().catch(() => {});
+        if (registration.waiting && navigator.serviceWorker.controller) {
+          registration.waiting.postMessage({ type: "SKIP_WAITING" });
+        }
+      }).catch(() => {});
     }
   </script>
 </body>
