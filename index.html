@@ -170,11 +170,17 @@
     }
 
     .grid.impact-grid {
-      grid-template-columns: repeat(3, 124px);
+      grid-template-columns: 58px repeat(3, 124px);
       align-items: start;
       justify-content: start;
       gap: 8px 14px;
-      max-width: 410px;
+      max-width: 500px;
+    }
+
+    .grid.impact-grid .casualty-title {
+      align-self: center;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .grid.impact-grid input[inputmode="numeric"] {
@@ -209,7 +215,7 @@
 
     .grid.impact-grid .impact-wide {
       grid-column: 1 / -1;
-      max-width: 400px;
+      max-width: 500px;
     }
 
     .grid.impact-grid .impact-environment {
@@ -474,9 +480,13 @@
 
     .checkmark {
       display: inline-block;
-      min-width: 1.15em;
+      min-width: 1.3em;
+      margin-right: 1px;
       font-family: "Microsoft JhengHei", Arial, sans-serif;
+      font-size: 16px;
       font-weight: 700;
+      line-height: 1;
+      vertical-align: -0.08em;
     }
 
     .official .multiline {
@@ -625,7 +635,10 @@
 
     body.pdf-rendering #paper .checkmark {
       font-family: "Times New Roman", "標楷體", "DFKai-SB", "BiauKai", "PMingLiU", serif !important;
-      font-size: 13px !important;
+      font-size: 16px !important;
+      min-width: 1.3em !important;
+      margin-right: 1px !important;
+      line-height: 1 !important;
     }
 
     .hidden-field {
@@ -677,7 +690,7 @@
       }
 
       .grid.impact-grid {
-        grid-template-columns: repeat(3, minmax(86px, 1fr));
+        grid-template-columns: 42px repeat(3, minmax(78px, 1fr));
         max-width: none;
         gap: 8px;
       }
@@ -902,7 +915,7 @@
             <div class="label">通報別</div>
             <div class="checks" id="reportTypeGroup">
               <label class="check"><input type="radio" name="reportType" id="initialReport" value="initial" checked>初報</label>
-              <label class="check"><input type="radio" name="reportType" id="followReport" value="follow">續報 <input id="followCount" type="number" min="1" inputmode="numeric" style="width:80px" aria-label="續報次數"> 次</label>
+              <label class="check"><input type="radio" name="reportType" id="followReport" value="follow">續報 <input id="followCount" type="number" min="1" inputmode="numeric" style="width:52px" aria-label="續報次數"> 次</label>
               <label class="check"><input type="radio" name="reportType" id="finalReport" value="final">結報</label>
             </div>
           </div>
@@ -958,31 +971,34 @@
           <label class="field full">停電戶數
             <input id="outageHouseholds" placeholder="例：無">
           </label>
-          <label class="field">死亡：員工
+          <div class="casualty-title">死亡</div>
+          <label class="field">員工
             <input id="deathEmployees" inputmode="numeric">
           </label>
-          <label class="field">死亡：其他人士
+          <label class="field">其他人士
             <input id="deathOthers" inputmode="numeric">
           </label>
-          <label class="field">死亡：外籍員工/人士
+          <label class="field">外籍員工/人士
             <input id="deathForeign" inputmode="numeric">
           </label>
-          <label class="field">失蹤：員工
+          <div class="casualty-title">失蹤</div>
+          <label class="field">員工
             <input id="missingEmployees" inputmode="numeric">
           </label>
-          <label class="field">失蹤：其他人士
+          <label class="field">其他人士
             <input id="missingOthers" inputmode="numeric">
           </label>
-          <label class="field">失蹤：外籍員工/人士
+          <label class="field">外籍員工/人士
             <input id="missingForeign" inputmode="numeric">
           </label>
-          <label class="field">受傷：員工
+          <div class="casualty-title">受傷</div>
+          <label class="field">員工
             <input id="injuryEmployees" inputmode="numeric">
           </label>
-          <label class="field">受傷：其他人士
+          <label class="field">其他人士
             <input id="injuryOthers" inputmode="numeric">
           </label>
-          <label class="field">受傷：外籍員工/人士
+          <label class="field">外籍員工/人士
             <input id="injuryForeign" inputmode="numeric">
           </label>
           <div class="field full impact-wide impact-environment">
