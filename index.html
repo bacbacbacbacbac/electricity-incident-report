@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 17:12:00 +08:00 editor-bottom-actions-v66">
+  <meta name="deployment-test" content="2026-07-02 17:26:00 +08:00 refresh-aware-time-v67">
   <style>
     :root {
       --ink: #202124;
@@ -1498,9 +1498,7 @@
 
     function refreshReportTimeForAction() {
       setReportTimeToNow();
-      if (checked("initialReport") && !checked("followReport") && !checked("finalReport")) {
-        el("occurredTime").value = val("awareTime");
-      } else if (!val("occurredTime")) {
+      if (!val("occurredTime")) {
         el("occurredTime").value = val("awareTime");
       }
       syncPreview();
@@ -2169,6 +2167,7 @@ ${styles}
     el("printBtn2").addEventListener("click", printReport);
     el("completeBtn2").addEventListener("click", openMailDraft);
     if (loadDraft()) {
+      setReportTimeToNow();
       syncPreview();
     } else {
       resetForm();
