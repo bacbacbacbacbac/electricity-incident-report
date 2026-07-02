@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 10:37:00 +08:00 tab-order-v49">
+  <meta name="deployment-test" content="2026-07-02 10:50:00 +08:00 impact-align-v51">
   <style>
     :root {
       --ink: #202124;
@@ -173,11 +173,11 @@
     }
 
     .grid.impact-grid {
-      grid-template-columns: 36px repeat(3, 86px);
+      grid-template-columns: 58px repeat(3, 86px);
       align-items: start;
       justify-content: start;
       gap: 6px 8px;
-      max-width: 310px;
+      max-width: 336px;
     }
 
     .grid.impact-grid .casualty-title {
@@ -190,7 +190,7 @@
     .casualty-row-input {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: 36px repeat(3, 86px);
+      grid-template-columns: 58px repeat(3, 86px);
       align-items: end;
       gap: 6px 8px;
     }
@@ -242,7 +242,7 @@
 
     .grid.impact-grid .impact-wide {
       grid-column: 1 / -1;
-      max-width: 310px;
+      max-width: 336px;
     }
 
     .grid.impact-grid .impact-environment {
@@ -293,7 +293,7 @@
 
     .grid.impact-grid .casualty-row-input input[inputmode="numeric"] {
       text-align: center;
-      margin-left: auto;
+      margin-left: 0;
       margin-right: auto;
     }
     label,
@@ -748,13 +748,13 @@
       }
 
       .grid.impact-grid {
-        grid-template-columns: 36px repeat(3, 86px);
-        max-width: 310px;
+        grid-template-columns: 58px repeat(3, 86px);
+        max-width: 336px;
         gap: 4px;
       }
 
       .casualty-row-input {
-        grid-template-columns: 36px repeat(3, 86px);
+        grid-template-columns: 58px repeat(3, 86px);
         gap: 4px;
       }
 
