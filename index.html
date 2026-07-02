@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 11:04:00 +08:00 casualty-label-align-v52">
+  <meta name="deployment-test" content="2026-07-02 11:14:00 +08:00 casualty-group-left-v53">
   <style>
     :root {
       --ink: #202124;
@@ -280,8 +280,10 @@
     }
 
     .grid.impact-grid .casualty-row-input .field {
-      align-items: center;
+      align-items: stretch;
       text-align: center;
+      width: 64px;
+      overflow: visible;
     }
 
     .grid.impact-grid .casualty-row-input .field .label,
@@ -293,7 +295,7 @@
 
     .grid.impact-grid .casualty-row-input input[inputmode="numeric"] {
       text-align: center;
-      margin-left: auto;
+      margin-left: 0;
       margin-right: auto;
     }
     label,
