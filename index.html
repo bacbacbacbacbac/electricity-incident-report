@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 10:18:00 +08:00 mobile-impact-v47">
+  <meta name="deployment-test" content="2026-07-02 10:37:00 +08:00 tab-order-v49">
   <style>
     :root {
       --ink: #202124;
@@ -279,6 +279,23 @@
       white-space: nowrap;
     }
 
+    .grid.impact-grid .casualty-row-input .field {
+      align-items: center;
+      text-align: center;
+    }
+
+    .grid.impact-grid .casualty-row-input .field .label,
+    .grid.impact-grid .casualty-row-input .field {
+      font-size: 12px;
+      line-height: 1.15;
+      justify-content: center;
+    }
+
+    .grid.impact-grid .casualty-row-input input[inputmode="numeric"] {
+      text-align: center;
+      margin-left: auto;
+      margin-right: auto;
+    }
     label,
     .label {
       font-size: 13px;
@@ -745,6 +762,12 @@
         font-size: 12px;
       }
 
+      .grid.impact-grid .casualty-row-input .field,
+      .grid.impact-grid .casualty-row-input .field .label {
+        font-size: 11px;
+        text-align: center;
+        align-items: center;
+      }
       .grid.impact-grid .field:not(.full) {
         width: auto;
       }
@@ -1294,6 +1317,30 @@
       "hasHighPressureLeak", "hasFlammableLeak", "dispatchPartial", "dispatchFull",
       "airPollution", "waterPollution", "otherPollution"
     ];
+    const tabOrderIds = [
+      "utilityName",
+      "otherCategory",
+      "followCount",
+      "cause",
+      "generationCapacity",
+      "storageCapacity",
+      "substationCount",
+      "feederCapacity",
+      "outageHouseholds",
+      "deathEmployees",
+      "deathOthers",
+      "deathForeign",
+      "missingEmployees",
+      "missingOthers",
+      "missingForeign",
+      "injuryEmployees",
+      "injuryOthers",
+      "injuryForeign",
+      "otherPollutionText",
+      "environmentScope",
+      "handling",
+      "remarks"
+    ];
 
     const samples = {
       wetai: {
@@ -1520,7 +1567,7 @@
       setText("pOccurredTime", formatDateTime(val("occurredTime")));
       setText("pIncidentName", val("incidentName"));
       setText("pSiteName", val("siteName"));
-      setText("pOtherCategory", val("otherCategory") ? `_________${val("otherCategory")}` : "_________");
+      setText("pOtherCategory", val("otherCategory") || "");
       setText("pCause", val("cause"));
       setText("pGenerationCapacity", val("generationCapacity"));
       setText("pStorageCapacity", val("storageCapacity"));
@@ -1714,6 +1761,45 @@
       const box = el("errors");
       box.className = "errors";
       box.textContent = "";
+    }
+
+    function visibleTabFields() {
+      return tabOrderIds
+        .map(id => el(id))
+        .filter(node => {
+          if (!node || node.disabled || node.type === "hidden") return false;
+          return Boolean(node.offsetParent || node.getClientRects().length);
+        });
+    }
+
+    function applyTabOrder() {
+      visibleTabFields().forEach((node, index) => {
+        node.tabIndex = index + 1;
+      });
+    }
+
+    function focusTabField(current, direction = 1) {
+      const fields = visibleTabFields();
+      const currentIndex = fields.indexOf(current);
+      if (currentIndex === -1 || fields.length === 0) return false;
+      const nextIndex = (currentIndex + direction + fields.length) % fields.length;
+      const next = fields[nextIndex];
+      next.focus();
+      if (typeof next.select === "function") next.select();
+      return true;
+    }
+
+    function setupTabNavigation() {
+      tabOrderIds.forEach(id => {
+        const node = el(id);
+        if (!node) return;
+        node.addEventListener("keydown", event => {
+          if (event.key !== "Tab") return;
+          event.preventDefault();
+          focusTabField(node, event.shiftKey ? -1 : 1);
+        });
+      });
+      applyTabOrder();
     }
 
     function buildExportHtml() {
@@ -2003,6 +2089,7 @@ ${styles}
     el("utilityName").addEventListener("change", () => {
       syncIncidentNameToUtility();
       applyUtilityProfile({ forceStorageCapacity: true });
+      applyTabOrder();
       syncPreview();
     });
 
@@ -2013,6 +2100,7 @@ ${styles}
     } else {
       resetForm();
     }
+    setupTabNavigation();
     window.addEventListener("resize", fitPreviewToScreen);
     window.addEventListener("orientationchange", () => window.setTimeout(fitPreviewToScreen, 250));
     window.addEventListener("beforeprint", clearPreviewFit);
