@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 18:58:00 +08:00 compact-handoff-code-v74">
+  <meta name="deployment-test" content="2026-07-02 19:12:00 +08:00 desktop-gmail-compose-v75">
   <style>
     :root {
       --ink: #202124;
@@ -2080,6 +2080,21 @@
       return lines.join("\n");
     }
 
+    function isMobileDevice() {
+      return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function emailComposeUrl(subject, body) {
+      const query = new URLSearchParams({
+        view: "cm",
+        fs: "1",
+        to: MAIL_RECIPIENT,
+        su: subject,
+        body
+      });
+      return `https://mail.google.com/mail/?${query.toString()}`;
+    }
+
     function showMessage(message, type = "info") {
       const box = el("errors");
       box.className = `errors show ${type === "info" ? "info" : ""}`.trim();
@@ -2295,8 +2310,15 @@ ${styles}
       const subject = emailSubject(options);
       showMessage("郵件草稿已開啟，請記得手動附加剛產出的速報表 PDF。", "info");
       const body = emailBody(options);
-      const url = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.location.href = url;
+      if (isMobileDevice()) {
+        const url = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = url;
+        return;
+      }
+      const compose = window.open(emailComposeUrl(subject, body), "_blank", "noopener");
+      if (!compose) {
+        window.location.href = `mailto:${MAIL_RECIPIENT}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      }
     }
 
     async function printReport() {
