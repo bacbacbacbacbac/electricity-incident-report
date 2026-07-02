@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 16:48:00 +08:00 top-export-email-buttons-v64">
+  <meta name="deployment-test" content="2026-07-02 16:55:00 +08:00 bottom-export-email-buttons-v65">
   <style>
     :root {
       --ink: #202124;
@@ -1027,10 +1027,6 @@
 
       <div id="deadlineStatus" class="status"></div>
       <div id="errors" class="errors"></div>
-      <div class="actions screen-only">
-        <button class="primary" type="button" id="printBtnTop">產出 PDF</button>
-        <button type="button" id="completeBtnTop">開啟郵件草稿</button>
-      </div>
 
       <fieldset>
         <legend>基本資料</legend>
@@ -1204,10 +1200,6 @@
     </section>
 
     <section class="preview-shell">
-      <div class="actions screen-only">
-        <button class="primary" type="button" id="printBtn2">產出 PDF</button>
-        <button type="button" id="completeBtn2">開啟郵件草稿</button>
-      </div>
       <article class="paper" id="paper">
         <h2 class="official-title">電業事故速報表</h2>
         <div class="official-meta">
@@ -1334,6 +1326,10 @@
         </div>
         <div class="page-number">2/2</div>
       </article>
+      <div class="actions screen-only">
+        <button class="primary" type="button" id="printBtn2">產出 PDF</button>
+        <button type="button" id="completeBtn2">開啟郵件草稿</button>
+      </div>
     </section>
   </main>
 
@@ -2169,8 +2165,6 @@ ${styles}
       syncPreview();
     });
 
-    el("printBtnTop").addEventListener("click", printReport);
-    el("completeBtnTop").addEventListener("click", openMailDraft);
     el("printBtn2").addEventListener("click", printReport);
     el("completeBtn2").addEventListener("click", openMailDraft);
     if (loadDraft()) {
