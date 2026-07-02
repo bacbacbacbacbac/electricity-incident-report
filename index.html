@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 12:14:00 +08:00 outage-text-center-v60">
+  <meta name="deployment-test" content="2026-07-02 16:12:00 +08:00 official-env-align-v61">
   <style>
     :root {
       --ink: #202124;
@@ -550,6 +550,32 @@
       font-weight: 700;
       line-height: 1;
       vertical-align: -0.08em;
+    }
+
+    .official-env {
+      display: grid;
+      gap: 2px;
+      line-height: 1.35;
+    }
+
+    .official-env-checks {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      column-gap: 26px;
+      align-items: center;
+      max-width: 430px;
+    }
+
+    .official-env-item,
+    .official-env-other,
+    .official-env-line {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .official-env-item {
+      gap: 4px;
     }
 
     .official .multiline {
@@ -1244,8 +1270,14 @@
             <tr>
               <td class="small-label">環境<br>影響</td>
               <td>
-                <span id="pAirPollution"></span>空氣污染<span id="pWaterPollution"></span>水污染<span id="pOtherPollution"></span>其他<span id="pOtherPollutionText"></span><br>
-                影響範圍：<span id="pEnvironmentScope"></span>
+                <div class="official-env">
+                  <div class="official-env-checks">
+                    <span class="official-env-item"><span id="pAirPollution"></span>空氣污染</span>
+                    <span class="official-env-item"><span id="pWaterPollution"></span>水污染</span>
+                    <span class="official-env-other"><span id="pOtherPollution"></span>其他<span id="pOtherPollutionText"></span></span>
+                  </div>
+                  <div class="official-env-line">影響範圍：<span id="pEnvironmentScope"></span></div>
+                </div>
               </td>
             </tr>
             <tr>
