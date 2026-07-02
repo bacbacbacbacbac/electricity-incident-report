@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 17:48:00 +08:00 aware-time-full-width-v69">
+  <meta name="deployment-test" content="2026-07-02 18:00:00 +08:00 occurred-time-input-v70">
   <style>
     :root {
       --ink: #202124;
@@ -1041,7 +1041,9 @@
           <label class="field full">電業知悉時間
             <input id="awareTime" data-required="電業知悉時間" type="datetime-local">
           </label>
-          <input id="occurredTime" data-required="發生時間" type="hidden">
+          <label class="field full">發生時間
+            <input id="occurredTime" data-required="發生時間" type="datetime-local">
+          </label>
           <input id="incidentName" data-required="事故名稱" type="hidden">
           <textarea id="siteName" data-required="發生地點及案場名稱" class="hidden-field"></textarea>
         </div>
@@ -1395,6 +1397,8 @@
     ];
     const tabOrderIds = [
       "utilityName",
+      "awareTime",
+      "occurredTime",
       "otherCategory",
       "followCount",
       "cause",
