@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 11:42:00 +08:00 foreign-label-centered-v57">
+  <meta name="deployment-test" content="2026-07-02 11:52:00 +08:00 impact-grid-unified-v58">
   <style>
     :root {
       --ink: #202124;
@@ -177,7 +177,7 @@
       align-items: start;
       justify-content: start;
       gap: 6px 8px;
-      max-width: 354px;
+      max-width: 358px;
     }
 
     .grid.impact-grid .casualty-title {
@@ -215,7 +215,7 @@
     }
 
     .grid.impact-grid #outageHouseholds {
-      width: 68px;
+      width: 64px;
       max-width: 100%;
     }
 
@@ -242,7 +242,7 @@
 
     .grid.impact-grid .impact-wide {
       grid-column: 1 / -1;
-      max-width: 354px;
+      max-width: 358px;
     }
 
     .grid.impact-grid .impact-environment {
@@ -268,10 +268,10 @@
     .grid.impact-grid .outage-field {
       grid-column: 1 / -1;
       display: grid;
-      grid-template-columns: max-content 68px;
+      grid-template-columns: 58px 92px;
       align-items: center;
       justify-self: start;
-      gap: 10px;
+      gap: 8px;
     }
 
     .grid.impact-grid .outage-field > span {
@@ -282,7 +282,7 @@
     .grid.impact-grid .casualty-row-input .field {
       align-items: stretch;
       text-align: center;
-      width: 64px;
+      width: 92px;
       overflow: visible;
       justify-self: start;
     }
@@ -296,7 +296,7 @@
 
     .grid.impact-grid .casualty-row-input input[inputmode="numeric"] {
       text-align: center;
-      margin-left: 0;
+      margin-left: auto;
       margin-right: auto;
     }
     label,
@@ -752,7 +752,7 @@
 
       .grid.impact-grid {
         grid-template-columns: 58px repeat(3, 92px);
-        max-width: 354px;
+        max-width: 346px;
         gap: 4px;
       }
 
@@ -804,8 +804,8 @@
       }
 
       .grid.impact-grid .outage-field {
-        grid-template-columns: max-content 68px;
-        gap: 10px;
+        grid-template-columns: 58px 92px;
+        gap: 4px;
       }
 
       .grid.impact-grid .impact-wide,
