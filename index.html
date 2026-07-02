@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 18:12:00 +08:00 time-input-mobile-align-v71">
+  <meta name="deployment-test" content="2026-07-02 18:32:00 +08:00 handoff-code-v72">
   <style>
     :root {
       --ink: #202124;
@@ -1041,6 +1041,19 @@
       <div id="errors" class="errors"></div>
 
       <fieldset>
+        <legend>案件交接</legend>
+        <div class="grid">
+          <label class="field full">貼上案件交接碼
+            <textarea id="handoffCode" placeholder="貼上手機產生的案件交接碼"></textarea>
+          </label>
+        </div>
+        <div class="actions screen-only">
+          <button type="button" id="importHandoffBtn">匯入案件</button>
+          <button type="button" id="copyHandoffTopBtn">複製目前案件交接碼</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
         <legend>基本資料</legend>
         <div class="grid">
           <label class="field full">電業名稱
@@ -1216,6 +1229,7 @@
       <div class="actions screen-only">
         <button class="primary" type="button" id="printBtn2">產出 PDF</button>
         <button type="button" id="completeBtn2">開啟郵件草稿</button>
+        <button type="button" id="copyHandoffBtn">複製交接碼</button>
       </div>
 
     </section>
@@ -1355,6 +1369,7 @@
     const EXPORT_ENDPOINT = "/api/export-and-email";
     const EXPORT_DIR_LABEL = "\\\\192.168.1.17\\Sean\\公司_節能屋\\速報表";
     const STORAGE_KEY = "electricityIncidentReportDraft.v1";
+    const HANDOFF_PREFIX = "EIR1:";
     const UTILITY_OPTIONS = ["節能屋能源科技股份有限公司", "華國能源股份有限公司"];
     const DEFAULT_UTILITY_NAME = UTILITY_OPTIONS[0];
     const UTILITY_PROFILES = {
@@ -1407,6 +1422,7 @@
       "airPollution", "waterPollution", "otherPollution"
     ];
     const tabOrderIds = [
+      "handoffCode",
       "utilityName",
       "awareTime",
       "occurredTime",
@@ -1522,6 +1538,136 @@
         el("occurredTime").value = val("awareTime");
       }
       syncPreview();
+    }
+
+    function base64UrlEncode(text) {
+      const bytes = new TextEncoder().encode(text);
+      let binary = "";
+      bytes.forEach(byte => {
+        binary += String.fromCharCode(byte);
+      });
+      return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function base64UrlDecode(text) {
+      const padded = text.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(text.length / 4) * 4, "=");
+      const binary = atob(padded);
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      return new TextDecoder().decode(bytes);
+    }
+
+    function currentFormData() {
+      const data = {};
+      ids.forEach(id => {
+        if (el(id)) data[id] = el(id).value;
+      });
+      boxes.forEach(id => {
+        if (el(id)) data[id] = checked(id);
+      });
+      data.category = radioValue("category");
+      data.scale = radioValue("scale");
+      data.reportType = currentReportKind();
+      data.createdAt = currentLocalDateTimeValue();
+      return data;
+    }
+
+    function makeCaseId(data) {
+      const occurred = (data.occurredTime || data.awareTime || currentLocalDateTimeValue()).replace(/[-:T]/g, "").slice(0, 12);
+      const name = (data.utilityName || "case").replace(/\s+/g, "").slice(0, 10);
+      return `${occurred}-${name}`;
+    }
+
+    function createHandoffCode() {
+      syncIncidentNameToUtility();
+      const data = currentFormData();
+      const payload = {
+        version: 1,
+        caseId: makeCaseId(data),
+        exportedAt: currentLocalDateTimeValue(),
+        data
+      };
+      return `${HANDOFF_PREFIX}${base64UrlEncode(JSON.stringify(payload))}`;
+    }
+
+    function parseHandoffCode(code) {
+      const trimmed = String(code || "").trim();
+      if (!trimmed.startsWith(HANDOFF_PREFIX)) {
+        throw new Error("案件交接碼格式不正確。");
+      }
+      const payload = JSON.parse(base64UrlDecode(trimmed.slice(HANDOFF_PREFIX.length)));
+      if (!payload || payload.version !== 1 || !payload.data) {
+        throw new Error("案件交接碼版本不支援。");
+      }
+      return payload;
+    }
+
+    async function copyText(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+      el("handoffCode").value = text;
+      el("handoffCode").focus();
+      el("handoffCode").select();
+      return document.execCommand("copy");
+    }
+
+    async function copyHandoffCode() {
+      try {
+        const code = createHandoffCode();
+        el("handoffCode").value = code;
+        await copyText(code);
+        showMessage("案件交接碼已複製。可貼到電腦版匯入續報。", "info");
+      } catch (error) {
+        showMessage(`無法產生交接碼：${error.message}`, "error");
+      }
+    }
+
+    function setRadioValue(name, value) {
+      const node = document.querySelector(`input[name="${name}"][value="${value}"]`);
+      if (node) node.checked = true;
+    }
+
+    function applyImportedReportProgress(data) {
+      const importedKind = data.reportType || (data.finalReport ? "final" : data.followReport ? "follow" : "initial");
+      el("initialReport").checked = false;
+      el("followReport").checked = false;
+      el("finalReport").checked = false;
+      if (importedKind === "final") {
+        el("finalReport").checked = true;
+        showMessage("此交接碼是結報案件，已匯入資料但未建立續報。", "info");
+        return;
+      }
+      el("followReport").checked = true;
+      const current = importedKind === "follow" ? Number(data.followCount) : 0;
+      el("followCount").value = Number.isFinite(current) && current > 0 ? String(current + 1) : "1";
+      showMessage(`案件已匯入，已自動切換為續報第 ${el("followCount").value} 次。`, "info");
+    }
+
+    function importHandoffCode() {
+      try {
+        const payload = parseHandoffCode(val("handoffCode"));
+        const data = payload.data;
+        resetForm();
+        setUtilityName(data.utilityName);
+        applyUtilityProfile();
+        ids.forEach(id => {
+          if (el(id) && data[id] != null) el(id).value = data[id];
+        });
+        boxes.forEach(id => {
+          if (el(id) && data[id] != null) el(id).checked = Boolean(data[id]);
+        });
+        if (data.category) setRadioValue("category", data.category);
+        if (data.scale) setRadioValue("scale", data.scale);
+        applyImportedReportProgress(data);
+        setReportTimeToNow();
+        el("noUpdateMode").value = "0";
+        syncIncidentNameToUtility();
+        applyFieldDefaults();
+        syncPreview();
+      } catch (error) {
+        showMessage(`匯入失敗：${error.message}`, "error");
+      }
     }
 
     function setText(id, text) {
@@ -2184,8 +2330,11 @@ ${styles}
       syncPreview();
     });
 
+    el("importHandoffBtn").addEventListener("click", importHandoffCode);
+    el("copyHandoffTopBtn").addEventListener("click", copyHandoffCode);
     el("printBtn2").addEventListener("click", printReport);
     el("completeBtn2").addEventListener("click", openMailDraft);
+    el("copyHandoffBtn").addEventListener("click", copyHandoffCode);
     if (loadDraft()) {
       if (!val("awareTime")) {
         setReportTimeToNow();
