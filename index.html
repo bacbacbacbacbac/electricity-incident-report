@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 18:00:00 +08:00 occurred-time-input-v70">
+  <meta name="deployment-test" content="2026-07-02 18:12:00 +08:00 time-input-mobile-align-v71">
   <style>
     :root {
       --ink: #202124;
@@ -318,6 +318,17 @@
       padding: 8px 9px;
       background: #fff;
       color: var(--ink);
+    }
+
+    #awareTime,
+    #occurredTime {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      text-align: left;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .fixed-display {
