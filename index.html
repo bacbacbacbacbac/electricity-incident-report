@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 16:24:00 +08:00 official-env-tight-checks-v62">
+  <meta name="deployment-test" content="2026-07-02 16:36:00 +08:00 official-all-checks-tight-v63">
   <style>
     :root {
       --ink: #202124;
@@ -552,10 +552,19 @@
       vertical-align: -0.08em;
     }
 
+    .official .checkmark {
+      min-width: auto;
+      margin-right: 0;
+    }
+
     .official-env {
       display: grid;
       gap: 2px;
       line-height: 1.35;
+    }
+
+    .official-check-row {
+      white-space: nowrap;
     }
 
     .official-env-checks {
@@ -576,11 +585,13 @@
       gap: 0;
     }
 
+    .official-check-row .checkmark,
     .official-env .checkmark {
       min-width: auto;
       margin-right: 0;
     }
 
+    .official-check-separator,
     .official-env-separator {
       white-space: pre;
     }
@@ -737,6 +748,8 @@
       line-height: 1 !important;
     }
 
+    body.pdf-rendering #paper .official .checkmark,
+    body.pdf-rendering #paper .official-check-row .checkmark,
     body.pdf-rendering #paper .official-env .checkmark {
       min-width: auto !important;
       margin-right: 0 !important;
@@ -1211,29 +1224,20 @@
             </tr>
             <tr>
               <td class="label-col">類別</td>
-              <td>
-                <span id="pCatEquipment"></span>設備運轉事故
-                <span id="pCatSafety"></span>工安衛生事故
-                <span id="pCatEnvironment"></span>環境影響事故
-                <span id="pCatLabor"></span>勞資爭議事故
-                <span id="pCatOther"></span>其他重大事故 <span id="pOtherCategory"></span>
+              <td class="official-check-row">
+                <span id="pCatEquipment"></span>設備運轉事故<span class="official-check-separator">　</span><span id="pCatSafety"></span>工安衛生事故<span class="official-check-separator">　</span><span id="pCatEnvironment"></span>環境影響事故<span class="official-check-separator">　</span><span id="pCatLabor"></span>勞資爭議事故<span class="official-check-separator">　</span><span id="pCatOther"></span>其他重大事故 <span id="pOtherCategory"></span>
               </td>
             </tr>
             <tr>
               <td class="label-col">規模</td>
-              <td>
-                <span id="pScaleSpecial"></span>特級規模
-                <span id="pScaleA"></span>甲級規模
-                <span id="pScaleB"></span>乙級規模
-                <span id="pScaleC"></span>丙級規模
+              <td class="official-check-row">
+                <span id="pScaleSpecial"></span>特級規模<span class="official-check-separator">　</span><span id="pScaleA"></span>甲級規模<span class="official-check-separator">　</span><span id="pScaleB"></span>乙級規模<span class="official-check-separator">　</span><span id="pScaleC"></span>丙級規模
               </td>
             </tr>
             <tr>
               <td colspan="2" class="label-col">通報別</td>
-              <td>
-                <span id="pInitialReport"></span>初報
-                <span id="pFollowReport"></span>續報(第<span id="pFollowCount">__</span>次)
-                <span id="pFinalReport"></span>結報
+              <td class="official-check-row">
+                <span id="pInitialReport"></span>初報<span class="official-check-separator">　</span><span id="pFollowReport"></span>續報(第<span id="pFollowCount">__</span>次)<span class="official-check-separator">　</span><span id="pFinalReport"></span>結報
               </td>
             </tr>
             <tr>
@@ -1259,7 +1263,7 @@
               <td><span id="pSubstationCheck"></span>停止運轉之一次變電所數 <span id="pSubstationCount" class="boxline"></span></td>
             </tr>
             <tr>
-              <td><span id="pDispatchPartial"></span>輸配電業中央調度室部分停止運轉；<span id="pDispatchFull"></span>輸配電業中央調度室全部停止運轉</td>
+              <td class="official-check-row"><span id="pDispatchPartial"></span>輸配電業中央調度室部分停止運轉<span class="official-check-separator">　</span><span id="pDispatchFull"></span>輸配電業中央調度室全部停止運轉</td>
             </tr>
             <tr>
               <td><span id="pFeederCheck"></span>輸電或單一配電饋線無法供電容量 <span id="pFeederCapacity" class="boxline"></span> MW</td>
