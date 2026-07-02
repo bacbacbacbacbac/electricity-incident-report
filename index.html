@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 16:12:00 +08:00 official-env-align-v61">
+  <meta name="deployment-test" content="2026-07-02 16:24:00 +08:00 official-env-tight-checks-v62">
   <style>
     :root {
       --ink: #202124;
@@ -559,11 +559,9 @@
     }
 
     .official-env-checks {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      column-gap: 26px;
+      display: flex;
       align-items: center;
-      max-width: 430px;
+      flex-wrap: nowrap;
     }
 
     .official-env-item,
@@ -575,7 +573,16 @@
     }
 
     .official-env-item {
-      gap: 4px;
+      gap: 0;
+    }
+
+    .official-env .checkmark {
+      min-width: auto;
+      margin-right: 0;
+    }
+
+    .official-env-separator {
+      white-space: pre;
     }
 
     .official .multiline {
@@ -728,6 +735,11 @@
       min-width: 1.3em !important;
       margin-right: 1px !important;
       line-height: 1 !important;
+    }
+
+    body.pdf-rendering #paper .official-env .checkmark {
+      min-width: auto !important;
+      margin-right: 0 !important;
     }
 
     .hidden-field {
@@ -1272,8 +1284,8 @@
               <td>
                 <div class="official-env">
                   <div class="official-env-checks">
-                    <span class="official-env-item"><span id="pAirPollution"></span>空氣污染</span>
-                    <span class="official-env-item"><span id="pWaterPollution"></span>水污染</span>
+                    <span class="official-env-item"><span id="pAirPollution"></span>空氣污染</span><span class="official-env-separator">　</span>
+                    <span class="official-env-item"><span id="pWaterPollution"></span>水污染</span><span class="official-env-separator">　</span>
                     <span class="official-env-other"><span id="pOtherPollution"></span>其他<span id="pOtherPollutionText"></span></span>
                   </div>
                   <div class="official-env-line">影響範圍：<span id="pEnvironmentScope"></span></div>
