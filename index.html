@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 16:36:00 +08:00 official-all-checks-tight-v63">
+  <meta name="deployment-test" content="2026-07-02 16:48:00 +08:00 top-export-email-buttons-v64">
   <style>
     :root {
       --ink: #202124;
@@ -1027,6 +1027,10 @@
 
       <div id="deadlineStatus" class="status"></div>
       <div id="errors" class="errors"></div>
+      <div class="actions screen-only">
+        <button class="primary" type="button" id="printBtnTop">產出 PDF</button>
+        <button type="button" id="completeBtnTop">開啟郵件草稿</button>
+      </div>
 
       <fieldset>
         <legend>基本資料</legend>
@@ -2165,6 +2169,8 @@ ${styles}
       syncPreview();
     });
 
+    el("printBtnTop").addEventListener("click", printReport);
+    el("completeBtnTop").addEventListener("click", openMailDraft);
     el("printBtn2").addEventListener("click", printReport);
     el("completeBtn2").addEventListener("click", openMailDraft);
     if (loadDraft()) {
