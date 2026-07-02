@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-02 18:44:00 +08:00 handoff-copy-visible-v73">
+  <meta name="deployment-test" content="2026-07-02 18:58:00 +08:00 compact-handoff-code-v74">
   <style>
     :root {
       --ink: #202124;
@@ -1369,7 +1369,8 @@
     const EXPORT_ENDPOINT = "/api/export-and-email";
     const EXPORT_DIR_LABEL = "\\\\192.168.1.17\\Sean\\公司_節能屋\\速報表";
     const STORAGE_KEY = "electricityIncidentReportDraft.v1";
-    const HANDOFF_PREFIX = "EIR1:";
+    const HANDOFF_PREFIX = "EIR2:";
+    const LEGACY_HANDOFF_PREFIX = "EIR1:";
     const UTILITY_OPTIONS = ["節能屋能源科技股份有限公司", "華國能源股份有限公司"];
     const DEFAULT_UTILITY_NAME = UTILITY_OPTIONS[0];
     const UTILITY_PROFILES = {
@@ -1421,6 +1422,55 @@
       "hasHighPressureLeak", "hasFlammableLeak", "dispatchPartial", "dispatchFull",
       "airPollution", "waterPollution", "otherPollution"
     ];
+    const handoffIdKeys = {
+      utilityName: "u",
+      awareTime: "a",
+      occurredTime: "o",
+      incidentName: "n",
+      siteName: "s",
+      otherCategory: "oc",
+      cause: "c",
+      generationCapacity: "g",
+      storageCapacity: "st",
+      substationCount: "ss",
+      feederCapacity: "f",
+      outageHouseholds: "oh",
+      deathEmployees: "de",
+      deathOthers: "do",
+      deathForeign: "df",
+      missingEmployees: "me",
+      missingOthers: "mo",
+      missingForeign: "mf",
+      injuryEmployees: "ie",
+      injuryOthers: "io",
+      injuryForeign: "if",
+      otherPollutionText: "opt",
+      environmentScope: "es",
+      handling: "h",
+      remarks: "r",
+      totalPages: "tp",
+      handler: "hd",
+      phone: "ph",
+      extension: "ex",
+      mobile: "mb",
+      supervisor: "sv",
+      followCount: "fc",
+      noUpdateMode: "nu"
+    };
+    const handoffBoxKeys = {
+      initialReport: "ir",
+      followReport: "fr",
+      finalReport: "zr",
+      hasExplosion: "he",
+      hasFire: "hf",
+      hasHighPressureLeak: "hp",
+      hasFlammableLeak: "hl",
+      dispatchPartial: "dp",
+      dispatchFull: "du",
+      airPollution: "ap",
+      waterPollution: "wp",
+      otherPollution: "op"
+    };
     const tabOrderIds = [
       "handoffCode",
       "utilityName",
@@ -1577,28 +1627,70 @@
       return `${occurred}-${name}`;
     }
 
+    function compactHandoffData(data) {
+      const compact = {};
+      Object.entries(handoffIdKeys).forEach(([id, key]) => {
+        if (data[id] != null && data[id] !== "") compact[key] = data[id];
+      });
+      Object.entries(handoffBoxKeys).forEach(([id, key]) => {
+        if (data[id]) compact[key] = 1;
+      });
+      if (data.category) compact.cg = data.category;
+      if (data.scale) compact.sc = data.scale;
+      if (data.reportType) compact.rt = data.reportType;
+      if (data.createdAt) compact.ca = data.createdAt;
+      return compact;
+    }
+
+    function expandHandoffData(compact) {
+      const data = {};
+      Object.entries(handoffIdKeys).forEach(([id, key]) => {
+        if (compact[key] != null) data[id] = compact[key];
+      });
+      Object.entries(handoffBoxKeys).forEach(([id, key]) => {
+        data[id] = Boolean(compact[key]);
+      });
+      data.category = compact.cg || "";
+      data.scale = compact.sc || "";
+      data.reportType = compact.rt || "";
+      data.createdAt = compact.ca || "";
+      return data;
+    }
+
     function createHandoffCode() {
       syncIncidentNameToUtility();
       const data = currentFormData();
       const payload = {
-        version: 1,
-        caseId: makeCaseId(data),
-        exportedAt: currentLocalDateTimeValue(),
-        data
+        v: 2,
+        i: makeCaseId(data),
+        t: currentLocalDateTimeValue(),
+        d: compactHandoffData(data)
       };
       return `${HANDOFF_PREFIX}${base64UrlEncode(JSON.stringify(payload))}`;
     }
 
     function parseHandoffCode(code) {
       const trimmed = String(code || "").trim();
+      if (trimmed.startsWith(LEGACY_HANDOFF_PREFIX)) {
+        const payload = JSON.parse(base64UrlDecode(trimmed.slice(LEGACY_HANDOFF_PREFIX.length)));
+        if (!payload || payload.version !== 1 || !payload.data) {
+          throw new Error("案件交接碼版本不支援。");
+        }
+        return payload;
+      }
       if (!trimmed.startsWith(HANDOFF_PREFIX)) {
         throw new Error("案件交接碼格式不正確。");
       }
       const payload = JSON.parse(base64UrlDecode(trimmed.slice(HANDOFF_PREFIX.length)));
-      if (!payload || payload.version !== 1 || !payload.data) {
+      if (!payload || payload.v !== 2 || !payload.d) {
         throw new Error("案件交接碼版本不支援。");
       }
-      return payload;
+      return {
+        version: 2,
+        caseId: payload.i,
+        exportedAt: payload.t,
+        data: expandHandoffData(payload.d)
+      };
     }
 
     async function copyText(text) {
