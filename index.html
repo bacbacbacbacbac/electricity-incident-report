@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-08-11 00:00:00 +08:00 reset-aware-time-on-open-v78">
+  <meta name="deployment-test" content="2026-08-11 00:00:00 +08:00 reset-both-times-on-open-v79">
   <style>
     :root {
       --ink: #202124;
@@ -1577,8 +1577,12 @@
       return `${y}-${m}-${d}T${h}:${min}`;
     }
 
-    function setReportTimeToNow() {
-      el("awareTime").value = currentLocalDateTimeValue();
+    function setReportTimeToNow(options = {}) {
+      const now = currentLocalDateTimeValue();
+      el("awareTime").value = now;
+      if (options.includeOccurred) {
+        el("occurredTime").value = now;
+      }
     }
 
     function refreshReportTimeForAction() {
@@ -2391,8 +2395,7 @@ ${styles}
       });
       setUtilityName(DEFAULT_UTILITY_NAME);
       applyUtilityProfile();
-      setReportTimeToNow();
-      el("occurredTime").value = val("awareTime");
+      setReportTimeToNow({ includeOccurred: true });
       applyFieldDefaults();
       boxes.forEach(id => {
         if (el(id)) el(id).checked = false;
@@ -2498,7 +2501,7 @@ ${styles}
     el("completeBtn2").addEventListener("click", openMailDraft);
     el("copyHandoffBtn").addEventListener("click", copyHandoffCode);
     if (loadDraft()) {
-      setReportTimeToNow();
+      setReportTimeToNow({ includeOccurred: true });
       syncPreview();
     } else {
       resetForm();
