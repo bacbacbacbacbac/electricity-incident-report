@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
   <title>電業事故速報表</title>
-  <meta name="deployment-test" content="2026-07-03 09:24:00 +08:00 compressed-handoff-code-v77">
+  <meta name="deployment-test" content="2026-08-11 00:00:00 +08:00 reset-aware-time-on-open-v78">
   <style>
     :root {
       --ink: #202124;
@@ -2498,9 +2498,7 @@ ${styles}
     el("completeBtn2").addEventListener("click", openMailDraft);
     el("copyHandoffBtn").addEventListener("click", copyHandoffCode);
     if (loadDraft()) {
-      if (!val("awareTime")) {
-        setReportTimeToNow();
-      }
+      setReportTimeToNow();
       syncPreview();
     } else {
       resetForm();
